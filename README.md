@@ -4,7 +4,7 @@
 
 **本仓库**是 [SQL-MC/DJP-2.x](https://github.com/SQL-MC/DJP-2.x) 在 **Minecraft 26.3 / Fabric** 上的可编译版本，修复了原仓库的构建问题，并**重排了主界面布局**（不再拥挤、不再互相遮挡）。
 
-![游戏内界面](assets/screenshot-ui-v2.png)
+![游戏内界面](assets/screenshot-ui-v3.png)
 
 | 项 | 值 |
 |---|---|
