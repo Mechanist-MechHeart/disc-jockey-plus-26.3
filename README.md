@@ -15,6 +15,14 @@
 
 ---
 
+## 🎬 演示视频
+
+[![点击观看演示视频](assets/demo-cover.jpg)](https://www.bilibili.com/video/BV1LqHc6pEZk)
+
+> 📺 **[MC音符盒自动演奏mod（适配26.3）含一键生成投影](https://www.bilibili.com/video/BV1LqHc6pEZk)** —— Bilibili · UP主：**LOD-时雨**
+
+---
+
 ## 📌 版本说明（废弃提醒）
 
 | 版本 | 状态 | 说明 |
