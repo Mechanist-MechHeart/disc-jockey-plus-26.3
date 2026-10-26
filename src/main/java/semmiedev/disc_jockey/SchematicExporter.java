@@ -87,23 +87,28 @@ public final class SchematicExporter {
         double reach = Math.min(player.blockInteractionRange(), 4.5D) - 0.15D;
         double reachSq = reach * reach;
 
-        // ---------- 1. 候选位置 ----------
+        // ---------- 1. 平面舞台：脚下 1 格 = 音符盒层，再下一格 = 音色方块层 ----------
+        // 全部方块都在同一层、都在脚下，从上方一眼看清，不存在"藏在里面够不到"的问题。
+        final int planeY = feet.getY() - 1;
         List<BlockPos> candidates = new ArrayList<>();
-        for (int dy = -5; dy <= 6; dy++) {
-            for (int dx = -5; dx <= 5; dx++) {
-                for (int dz = -5; dz <= 5; dz++) {
-                    BlockPos pos = feet.offset(dx, dy, dz);
-                    if (isBlockedCell(pos, feet)) continue;                       // 身体/脚下方
-                    if (new AABB(pos).distanceToSqr(eye) >= reachSq) continue;    // 手长内
-                    if (!level.getBlockState(pos).isAir()) continue;              // 要能放音符盒
-                    if (!level.getBlockState(pos.below()).isAir()) continue;      // 正下方要空（放音色方块）
-                    candidates.add(pos);
-                }
+        for (int dx = -6; dx <= 6; dx++) {
+            for (int dz = -6; dz <= 6; dz++) {
+                BlockPos pos = new BlockPos(feet.getX() + dx, planeY, feet.getZ() + dz);
+                if (new AABB(pos).distanceToSqr(eye) >= reachSq) continue;    // 手长内
+                if (!level.getBlockState(pos).isAir()) continue;              // 要能放音符盒
+                if (!level.getBlockState(pos.below()).isAir()) continue;      // 正下方要空（放音色方块）
+                candidates.add(pos);
             }
         }
         candidates.sort(Comparator.comparingDouble(p -> new AABB(p).distanceToSqr(eye)));
 
-        // ---------- 2. 分配位置（音符盒之间不能上下相邻，否则音色方块没地方放） ----------
+        if (candidates.isEmpty()) {
+            return new Result(false,
+                    "§c[Disc Jockey] 脚下两层没有空位：请站在 1×1 的柱子顶上，或把地面挖掉两层后再生成"
+                            + "（音符盒需要正下方一格放音色方块）", null);
+        }
+
+        // ---------- 2. 分配位置（同一层平台，不存在上下相邻问题） ----------
         List<Placed> placed = new ArrayList<>();
         Set<BlockPos> used = new HashSet<>();
         int skipped = 0;
@@ -112,7 +117,6 @@ public final class SchematicExporter {
             BlockPos chosen = null;
             for (BlockPos c : candidates) {
                 if (used.contains(c)) continue;
-                if (used.contains(c.above()) || used.contains(c.below())) continue;
                 chosen = c;
                 break;
             }
@@ -171,9 +175,8 @@ public final class SchematicExporter {
 
     /** 玩家身体两格、以及"身体格正上方"都不能放音符盒（音色方块会卡在身体里） */
     private static boolean isBlockedCell(BlockPos pos, BlockPos feet) {
-        if (pos.equals(feet) || pos.equals(feet.above())) return true;
-        if (pos.below().equals(feet) || pos.below().equals(feet.above())) return true;
-        return false;
+        return pos.equals(feet) || pos.equals(feet.above())
+                || pos.below().equals(feet) || pos.below().equals(feet.above());
     }
 
     private static final class Placed {
@@ -244,8 +247,8 @@ public final class SchematicExporter {
         meta.putString("Name", "DJ: " + (song.displayName == null ? "song" : song.displayName));
         meta.putString("Author", "Disc Jockey Plus");
         meta.putString("Description",
-                "由 Disc Jockey Plus 生成：按歌曲需要自动排布的音符盒机器。"
-                        + "站在区域中间（红色区域）演奏；每个音符盒下方已放好对应音色方块。");
+                "由 Disc Jockey Plus 生成：平面音符盒舞台。音符盒全部铺在脚下同一层，"
+                        + "正下方放好对应音色方块；从上方一眼看清、伸手可及。站在舞台中间演奏即可。");
         meta.putInt("RegionCount", 1);
         meta.putInt("TotalVolume", volume);
         meta.putInt("TotalBlocks", totalBlocks);
