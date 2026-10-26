@@ -49,6 +49,33 @@
 - **音符盒编辑器**：可视化查看/修改歌曲音符
 - **音符盒扫描**：一键统计周围音符盒
 
+### 🧱 一键生成投影（本仓库新增）
+音符盒的"音色"由**下方方块**决定（石=底鼓、沙=军鼓、玻璃=踩镲、木板=贝斯、黏土=长笛、金块=钟…），
+所以以前每首歌都要手动摆方块、还要等它自己调音高。
+
+现在可以直接让模组**按当前歌曲自动生成 Litematica 投影**：
+
+1. 在歌单里选一首歌 → 点底部 **「生成投影」**（或输入 `/discjockey schematic [歌名]`）
+2. 模组会算出这首歌需要的全部 **音色 + 音高** 组合，在你**伸手可及**的范围内自动排布音符盒，
+   每个音符盒**正下方**放好对应音色方块，并输出 `schematics/dj_<歌名>.litematic`
+3. 打开 Litematica 加载这个投影，把**橙色原点角块对齐到你脚下那格**
+4. 用 **litematica-printer** 一键打印 → 站到机器中间 → 回 DJP 点播放
+
+生成时会避开你身体所在的格子、避开已有方块，位置按由近到远分配，机器尽量紧凑；
+如果附近空位不够，聊天栏会提示还有多少音符放不下（换个空旷位置再生成即可）。
+
+---
+
+## 💻 指令
+
+| 指令 | 作用 |
+|---|---|
+| `/discjockey` | 打开主界面 |
+| `/discjockey schematic [歌名]` | **按歌曲生成投影**（不填歌名 = 当前播放/选中的歌） |
+| `/discjockey help` | 查看全部子指令 |
+| `/discjockey transpose <±半音>` | 移调 |
+| `/discjockey status` | 查看播放/调音状态 |
+
 ### ⚙️ 配置
 - 基于 **Cloth Config** 的图形化配置（ModMenu → Disc Jockey Plus）
 - 收藏、歌词偏移、输出方式、频谱样式等自动保存
@@ -74,7 +101,7 @@
 
 1. 安装 **Fabric Loader**（≥ 0.19.5）与 **Fabric API**
 2. 安装 **Cloth Config**（必需），可选装 **ModMenu**（配置入口）、**PianoLib**（钢琴采样）
-3. 把 `disc_jockey_plus-2.9.1.jar` 丢进 `mods/`
+3. 把 `disc_jockey_plus-2.9.2.jar` 丢进 `mods/`
 4. 进游戏按 `J` 打开界面，选歌 → 播放
 5. 首次启动会生成 `config/disc_jockey/`，把 `.nbs` 歌曲放进去（或用界面里的「下载 NBS」）
 
@@ -114,12 +141,18 @@
 - **顶部**：左侧「编辑」+ 右侧四个等宽控件（全局播放 / 变调 / 变速 / 导入 MIDI），统一 20px 高、6px 间距；
   原来压在歌单上的 MIDI 路径文字移到按钮下方居中
 - **左侧播放器面板**：状态 → 歌名 → 曲名/作者卡片 → 进度条 → ⏸⏹ → 歌词行，逐行分层，**不再互相重叠**
-- **底部两排按钮**：导出/设置/样式/刷新 一排，播放/预览/音符盒/钢琴 一排，统一宽度与间距，不再挤在一起
+- **底部两排按钮**：导出/设置/样式/刷新 一排，播放/预览/音符盒/钢琴/生成投影 一排，统一宽度与间距，不再挤在一起
 - **歌单**：左右两栏 44% : 56%，列表占满右栏，搜索框贴右栏底部
 - **频谱**：从屏幕底边移进左侧面板下方区域，五种样式都不会溢出面板
 - 布局按 1280×800（GUI Scale 2）设计，同时用屏幕比例计算，1080p / 2K 全屏也保持间距
 
 ![新布局示意](assets/layout-v2-preview.png)
+
+### 3. 新增「生成投影」（`SchematicExporter`，v2.9.2）
+- 新增 `SchematicExporter`：解析当前歌曲的 (音色, 音高) 组合，在玩家手长范围内自动排布音符盒阵列
+  （每个音符盒下方放对应音色方块，避开身体格与已有方块，避免上下相邻冲突），导出 Litematica `.litematic`
+- 界面新增按钮 **「生成投影」**；指令新增 `/discjockey schematic [歌名]`
+- 投影原点对齐到"玩家脚下那格"，把橙色角块放到脚下即可用 printer 一键打印
 
 ---
 
@@ -137,11 +170,12 @@
 
 ## 🌐 English Summary
 
-**Disc Jockey Plus** for **Minecraft 26.3 / Fabric** — play note-block songs from NBS/MIDI files, with a song browser (favorites + search), playback controls (pause/stop/seek/loop/speed/transpose), lyric sync (public/private + offset), 5 spectrum visualizer styles (also shown on the HUD), MIDI import & NBS/MIDI/WAV export, an 88-key piano GUI, and a note-block song editor.
+**Disc Jockey Plus** for **Minecraft 26.3 / Fabric** — play note-block songs from NBS/MIDI files, with a song browser (favorites + search), playback controls (pause/stop/seek/loop/speed/transpose), lyric sync (public/private + offset), 5 spectrum visualizer styles (also shown on the HUD), MIDI import & NBS/MIDI/WAV export, an 88-key piano GUI, a note-block song editor, and **one-click Litematica schematic generation** for the selected song.
 
 This fork is a rebuild of [SQL-MC/DJP-2.x](https://github.com/SQL-MC/DJP-2.x) that:
 1. fixes the hardcoded JDK path and the local PianoLib jar dependency (it is only used via reflection at runtime),
-2. **redesigns the main screen layout** into a clean two-column UI with two tidy button rows, no more overlapping widgets.
+2. **redesigns the main screen layout** into a clean two-column UI with two tidy button rows, no more overlapping widgets,
+3. **adds schematic export** (`SchematicExporter` / `/discjockey schematic`): builds the note-block machine a song needs (instrument blocks under each note block, correct pitches) within vanilla reach, ready to print with litematica-printer.
 
 Requirements: Fabric Loader ≥ 0.19.5, Fabric API, Cloth Config; optional: ModMenu, PianoLib.
 Build with **JDK 25** and Gradle 9.8.x (Loom non-remap variant). Licensed MIT.

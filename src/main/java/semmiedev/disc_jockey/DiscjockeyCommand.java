@@ -283,6 +283,42 @@ public class DiscjockeyCommand {
                                             return 1;
                                         })
                                 )
+                                .then(literal("schematic")
+                                        .executes(ctx -> {
+                                            if (isLoading(ctx)) return 0;
+                                            Song song = Main.SONG_PLAYER != null ? Main.SONG_PLAYER.song : null;
+                                            if (song == null) {
+                                                ctx.getSource().sendError(Component.literal(
+                                                        "§c[Disc Jockey] 先选一首歌（或输入 /discjockey schematic <歌名>）"));
+                                                return 0;
+                                            }
+                                            SchematicExporter.Result r = SchematicExporter.export(
+                                                    net.minecraft.client.Minecraft.getInstance(), song);
+                                            ctx.getSource().sendFeedback(Component.literal(r.message));
+                                            return r.ok ? 1 : 0;
+                                        })
+                                        .then(argument("song", StringArgumentType.greedyString())
+                                                .suggests((ctx, builder) -> suggest(SongLoader.SONG_SUGGESTIONS, builder))
+                                                .executes(ctx -> {
+                                                    if (isLoading(ctx)) return 0;
+                                                    String name = StringArgumentType.getString(ctx, "song");
+                                                    Song song = SongLoader.SONGS.stream()
+                                                            .filter(s -> s.fileName.equalsIgnoreCase(name)
+                                                                    || (s.displayName != null && s.displayName.equalsIgnoreCase(name)))
+                                                            .findFirst()
+                                                            .orElse(null);
+                                                    if (song == null) {
+                                                        ctx.getSource().sendError(Component.literal(
+                                                                "§c[Disc Jockey] 找不到歌曲：" + name));
+                                                        return 0;
+                                                    }
+                                                    SchematicExporter.Result r = SchematicExporter.export(
+                                                            net.minecraft.client.Minecraft.getInstance(), song);
+                                                    ctx.getSource().sendFeedback(Component.literal(r.message));
+                                                    return r.ok ? 1 : 0;
+                                                })
+                                        )
+                                )
                                 .then(literal("status")
                                         .executes(ctx -> {
                                             if (Main.SONG_PLAYER == null || Main.SONG_PLAYER.song == null) {

@@ -817,6 +817,24 @@ public class DiscJockeyScreen extends Screen {
         ).pos(uiLeft + 348, uiRow2Y).size(110, 20).build();
         addRenderableWidget(pianoButton);
 
+        // ★ 生成投影：按当前歌曲自动排布音符盒机器，输出 .litematic
+        Button schematicButton = Button.builder(
+                Component.literal("生成投影"),
+                btn -> {
+                    SongListWidget.SongEntry e = songListWidget.getSelected();
+                    if (e == null || e.song == null) {
+                        showMsg("§c先选一首歌");
+                        return;
+                    }
+                    SchematicExporter.Result r = SchematicExporter.export(minecraft, e.song);
+                    minecraft.gui.chatListener().handleSystemMessage(Component.literal(r.message), false);
+                }
+        ).pos(uiLeft + 464, uiRow2Y).size(110, 20)
+                .tooltip(Tooltip.create(Component.literal(
+                        "按这首歌需要的音色/音高自动生成 Litematica 投影\n（放到脚下后用 printer 打印，再回来播放）")))
+                .build();
+        addRenderableWidget(schematicButton);
+
         
         Button importMidiButton = Button.builder(
                 Component.translatable("disc_jockey.screen.import_midi"),
