@@ -1,0 +1,1733 @@
+package semmiedev.disc_jockey.gui.screen;
+
+
+
+import semmiedev.disc_jockey.Main;
+import semmiedev.disc_jockey.NbsRecorder;
+import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.util.RandomSource;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+
+import com.mojang.blaze3d.platform.InputConstants;  
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+
+import javax.sound.midi.*;
+
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+// ============================================================
+// 版本：Fabric / MC 26.3（渲染 4 参）
+// 相对基线改了三处（音高修正 / 广播拆流 / MIDI 联动广播），
+// 其余一字未动。渲染签名按版本区分（26.3=4参，26.4=1参）。
+// ============================================================
+public class PianoKeyboardScreen extends Screen {
+
+    private static final int NOTE_ID_A0 = -39;
+    private static final int NOTE_ID_C8 = 48;
+
+    
+    private static final int NOTE_ID_A_MIN = -63;
+    private static final int RW_SPAN = NOTE_ID_C8 - NOTE_ID_A_MIN + 1; 
+
+    
+    private static final int PIANO_KEY_CENTER = 39;
+
+    private static final int DISPLAY_BASE = 4;
+    private static final int DISPLAY_MIN = 1;
+    private static final int DISPLAY_MAX = 9;
+    private static final int INTERNAL_MIN = -3;
+    private static final int INTERNAL_MAX = 3;
+
+    
+    private static final int[] WHITE_NOTE_IDS = {
+        -39,-37,
+        -36,-34,-32,-31,-29,-27,-25,
+        -24,-22,-20,-19,-17,-15,-13,
+        -12,-10, -8, -7, -5, -3, -1,
+          0,  2,  4,  5,  7,  9, 11,
+         12, 14, 16, 17, 19, 21, 23,
+         24, 26, 28, 29, 31, 33, 35,
+         36, 38, 40, 41, 43, 45, 47,
+         48
+    };
+    private static final int TOTAL_WHITE = WHITE_NOTE_IDS.length;
+    private static final int C4_INDEX = 23; 
+
+    
+    private static final int[] BLACK_NOTE_IDS = {
+        -38,
+        -35,-33,-30,-28,-26,
+        -23,-21,-18,-16,-14,
+        -11, -9, -6, -4, -2,
+          1,  3,  6,  8, 10,
+         13, 15, 18, 20, 22,
+         25, 27, 30, 32, 34,
+         37, 39, 42, 44, 46
+    };
+    private static final int TOTAL_BLACK = BLACK_NOTE_IDS.length;
+
+    
+    private static final int[] BLACK_AFTER_WHITE = {
+        0,
+        2,3,5,6,7,
+        9,10,12,13,14,
+        16,17,19,20,21,
+        23,24,26,27,28,
+        30,31,33,34,35,
+        37,38,40,41,42,
+        44,45,47,48,49
+    };
+
+    
+    private static final int SC_ESC   = 41; 
+    private static final int SC_RIGHT = 79; 
+    private static final int SC_LEFT  = 80; 
+    private static final Map<Integer, Integer> KEY_MAP = new LinkedHashMap<>();
+    static {
+        KEY_MAP.put(  4,  0);   
+        KEY_MAP.put( 22,  2);   
+        KEY_MAP.put( 26,  1);   
+        KEY_MAP.put(  8,  3);   
+        KEY_MAP.put(  7,  4);   
+        KEY_MAP.put(  9,  5);   
+        KEY_MAP.put( 23,  6);   
+        KEY_MAP.put( 10,  7);   
+        KEY_MAP.put( 28,  8);   
+        KEY_MAP.put( 11,  9);   
+        KEY_MAP.put( 24, 10);   
+        KEY_MAP.put( 13, 11);   
+        KEY_MAP.put( 14, 12);   
+        KEY_MAP.put( 18, 13);   
+        KEY_MAP.put( 15, 14);   
+        KEY_MAP.put( 19, 15);   
+        KEY_MAP.put( 51, 16);   
+        KEY_MAP.put( 52, 17);   // ' -> F5
+    };
+
+    
+    private static final Map<Integer, String> SCAN_NAME;
+    static {
+        Map<Integer, String> m = new HashMap<>();
+        m.put(4,"A"); m.put(22,"W"); m.put(26,"S"); m.put(8,"E"); m.put(20,"R"); m.put(7,"D");
+        m.put(9,"F"); m.put(23,"T"); m.put(10,"G"); m.put(28,"Y"); m.put(11,"H");
+        m.put(24,"U"); m.put(13,"J"); m.put(14,"K"); m.put(18,"O"); m.put(15,"L");
+        m.put(19,"P"); m.put(51,";"); m.put(52,"'");
+        m.put(30,"1"); m.put(31,"2"); m.put(32,"3");
+        m.put(41,"ESC"); m.put(80,"LEFT"); m.put(79,"RIGHT"); m.put(82,"UP"); m.put(81,"DOWN");
+        SCAN_NAME = m;
+    }
+
+    
+    private static final int WKW = 48, WKH = 150;
+    private static final int BKW = 30, BKH = 95;
+    private static final int KX = 40;
+    private static final int RY = 70, RH = 70;
+    private static final int BY = RY + RH + 4;
+    private static final int KY = BY + 26;
+    private static final int SY = KY + WKH + 4;
+    private static final int ICON = 22;
+    private static final int TY = 8, TS = 22;
+
+    
+    private static final int REC_BTN_W = 60;
+    private static final int REC_BTN_H = TS;
+    private static final int REC_BTN_X = 10;
+    private static final int REC_BTN_Y = TY;
+    /** 录制NBS 按钮宽度（放在 X 退出左边；窄窗口时可调小，如 56） */
+    private static final int REC_NBS_W = 72;
+
+    private final Screen parent;
+    private final Map<Integer, Boolean> pressed = new HashMap<>();
+    private int shift = 0;
+    private final Set<Integer> active = new HashSet<>();
+
+    
+    private static final boolean DEBUG_KEYS = true;  
+    private final Map<String, Boolean> keyState = new HashMap<>();
+    private final Set<Integer> heldKeys = new HashSet<>(); 
+    private boolean wasMouseDown = false;
+
+    private boolean broadcast = false;
+    private Button sndBtn;
+    private Button recBtn;
+    private Button recNbsBtn;
+    private EditBox recRadiusBox;
+    private EditBox recNameBox;
+    private Button recTempoBtn;
+    private final Map<Integer, BlockPos> nbCache = new HashMap<>();
+    private boolean nbReady = false;
+    private int scanTick = 0;
+    private long lastPkt = -1;
+    private static final long PKT_INT = 50;
+    /** MIDI 回放：每帧最多广播几个音符（防服务器限流，同时保证和弦不丢） */
+    private static final int MAX_MIDI_PKT_PER_TICK = 4;
+
+    private final List<Note> history = new ArrayList<>();
+    private static final int HIST_MAX = 48;
+
+    private static class Note {
+        final int id, lx, iv;
+        int age;
+        Note(int n, int l, int i) { id = n; lx = l; iv = i; age = 0; }
+    }
+
+    
+    private static volatile Boolean apiOK = null;
+    private static volatile Class<?> apiCls = null;
+    private static volatile Method apiPlay = null;
+    private static volatile boolean libReady = false;
+    private static volatile Method mcPlay = null;
+    private static volatile Object mcSrc = null;
+    private static final Map<Integer, Object> libCache = new HashMap<>();
+
+    private static volatile Method gwM = null, ghM = null;
+    private static volatile boolean refDone = false;
+
+    
+    private static final MidiRecorder MIDI_REC = new MidiRecorder();
+
+    /** MIDI 回放：用 PianoLib 音色播放 .mid，同时驱动琴键高亮与滚落 */
+    private static final MidiPlayback MIDI_PLAY = new MidiPlayback();
+    private static final java.util.Queue<int[]> MIDI_EVENTS =
+            new java.util.concurrent.ConcurrentLinkedQueue<>();
+
+    private Button playMidiButton;
+    private Button midiFileButton;
+    private java.util.List<java.io.File> midiFiles = new java.util.ArrayList<>();
+    private int midiFileIndex = 0;
+    public PianoKeyboardScreen(Screen parent) {
+        super(Component.literal("[Disc Jockey] Piano"));
+        this.parent = parent;
+    }
+
+    /** 26.4 移除了 Mth.clamp 的 float 重载（NoSuchMethodError），改用纯 JDK 实现，不依赖任何 MC API */
+    private static float clampF(float v, float lo, float hi) {
+        if (v < lo) return lo;
+        if (v > hi) return hi;
+        return v;
+    }
+
+    private static int clampI(int v, int lo, int hi) {
+        if (v < lo) return lo;
+        if (v > hi) return hi;
+        return v;
+    }
+
+    
+    private void setShift(int s) {
+        int old = shift;
+        shift = clampI(s, INTERNAL_MIN, INTERNAL_MAX);
+        if (old != shift) {
+            System.out.println("[DJ] shift " + old + " -> " + shift + " (display +" + getDisp() + ")");
+        }
+    }
+
+    private int getDisp() { return shift + DISPLAY_BASE; }
+
+    private void addDisp(int d) {
+        setShift(shift + d);
+    }
+
+    private void setDisp(int d) {
+        setShift(d - DISPLAY_BASE);
+    }
+
+    
+    private static String name(int midi) {
+        String[] n = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+        int cls = ((midi % 12) + 12) % 12;
+        int oct = (midi - cls) / 12 - 1;
+        return n[cls] + oct;
+    }
+
+    private static String nameOfId(int id) {
+        return name(id + 60);
+    }
+
+    private String labelForWhite(int i) {
+        int nid = WHITE_NOTE_IDS[i] + shift * 12;
+        return nameOfId(nid);
+    }
+
+    private String labelForBlack(int i) {
+        int nid = BLACK_NOTE_IDS[i] + shift * 12;
+        return nameOfId(nid);
+    }
+
+    private static boolean isPianoAPIAvail() {
+        if (apiOK != null) return apiOK;
+        try {
+            apiCls = Class.forName("sqlmc.api.PianoAPI");
+            apiOK = (boolean) apiCls.getMethod("isAvailable").invoke(null);
+            apiPlay = apiCls.getMethod("playPianoKey", int.class, float.class);
+            System.out.println("[DJ] PianoAPI available=" + apiOK);
+        } catch (Throwable t) {
+            apiOK = false;
+            System.out.println("[DJ] PianoAPI not found");
+        }
+        return apiOK;
+    }
+
+    
+    private static void initLib() {
+        if (libReady) return;
+        int n = 0;
+        try {
+            for (int k = 0; k <= 87; k++) {
+                try {
+                    Identifier loc = Identifier.fromNamespaceAndPath("pianolib", "key_" + k);
+                    SoundEvent evt = SoundEvent.createVariableRangeEvent(loc);
+                    int noteId = k - 39;
+                    libCache.put(noteId, evt);
+                    n++;
+                } catch (Throwable ignored) {}
+            }
+
+            if (n == 0) {
+                String[] altNames = {
+                    "a0","a1","a2","a3","a4","a5","a6","a7",
+                    "as0","as1","as2","as3","as4","as5","as6","as7",
+                    "b0","b1","b2","b3","b4","b5","b6","b7",
+                    "c1","c2","c3","c4","c5","c6","c7","c8",
+                    "cs1","cs2","cs3","cs4","cs5","cs6","cs7",
+                    "d1","d2","d3","d4","d5","d6","d7",
+                    "ds1","ds2","ds3","ds4","ds5","ds6","ds7",
+                    "e1","e2","e3","e4","e5","e6","e7",
+                    "f1","f2","f3","f4","f5","f6","f7",
+                    "fs1","fs2","fs3","fs4","fs5","fs6","fs7",
+                    "g1","g2","g3","g4","g5","g6","g7",
+                    "gs1","gs2","gs3","gs4","gs5","gs6","gs7"
+                };
+                for (int i = 0; i < altNames.length && i < 88; i++) {
+                    try {
+                        Identifier loc = Identifier.fromNamespaceAndPath("pianolib", altNames[i]);
+                        SoundEvent evt = SoundEvent.createVariableRangeEvent(loc);
+                        int noteId = i - 39;
+                        libCache.put(noteId, evt);
+                        n++;
+                    } catch (Throwable ignored) {}
+                }
+            }
+
+            if (n == 0) {
+                try {
+                    Object reg = Class.forName("net.minecraft.core.registries.BuiltInRegistries")
+                        .getField("SOUND_EVENT").get(null);
+
+                    Method getHolder = null;
+                    for (Method m : reg.getClass().getMethods()) {
+                        if (m.getName().equals("getHolder") && m.getParameterCount() == 1) {
+                            getHolder = m; break;
+                        }
+                    }
+                    Method getOptional = null;
+                    for (Method m : reg.getClass().getMethods()) {
+                        if (m.getName().equals("get") && m.getParameterCount() == 1
+                            && m.getReturnType().getSimpleName().contains("Optional")) {
+                            getOptional = m; break;
+                        }
+                    }
+
+                    for (int k = 0; k <= 87; k++) {
+                        try {
+                            Identifier loc = Identifier.fromNamespaceAndPath("pianolib", "key_" + k);
+                            Object holder = null;
+                            if (getHolder != null) {
+                                holder = getHolder.invoke(reg, loc);
+                            } else if (getOptional != null) {
+                                Object opt = getOptional.invoke(reg, loc);
+                                if (opt instanceof Optional && ((Optional<?>) opt).isPresent()) {
+                                    holder = ((Optional<?>) opt).get();
+                                }
+                            }
+                            if (holder != null) {
+                                try {
+                                    Method valM = holder.getClass().getMethod("value");
+                                    Object evt = valM.invoke(holder);
+                                    if (evt instanceof SoundEvent) {
+                                        int noteId = k - 39;
+                                        libCache.put(noteId, evt);
+                                        n++;
+                                    }
+                                } catch (Throwable ignored) {}
+                            }
+                        } catch (Throwable ignored) {}
+                    }
+                } catch (Throwable t) {
+                    System.out.println("[DJ] Registry fallback failed: " + t.getMessage());
+                }
+            }
+
+            libReady = n > 0;
+            System.out.println("[DJ] PianoLib cache: " + n + "/88 (Identifier)");
+        } catch (Throwable t) {
+            libReady = false;
+            t.printStackTrace();
+            System.out.println("[DJ] PianoLib initLib FAILED, cached " + n + " sounds");
+        }
+
+        if (mcPlay == null) {
+            try {
+                mcPlay = Class.forName("net.minecraft.world.level.Level").getMethod(
+                    "playLocalSound", BlockPos.class, SoundEvent.class,
+                    SoundSource.class, float.class, float.class, boolean.class);
+                mcSrc = Class.forName("net.minecraft.sounds.SoundSource").getField("RECORDS").get(null);
+            } catch (Throwable ignored) {}
+        }
+    }
+
+
+    private static boolean playLib(int id) {
+        if (id < NOTE_ID_A0 || id > NOTE_ID_C8) {
+            System.out.println("[DJ] REJECT noteId=" + id + " out of range A0~C8");
+            return false;
+        }
+
+        Minecraft m = Minecraft.getInstance();
+        boolean inWorld = m.level != null && m.player != null;
+
+        
+        if (inWorld && isPianoAPIAvail() && apiPlay != null) {
+            try {
+                int apiKey = id + PIANO_KEY_CENTER;
+                apiPlay.invoke(null, apiKey, 1f);
+                System.out.println("[DJ] PianoAPI key=" + apiKey + " noteId=" + id + "(" + nameOfId(id) + ") [world]");
+                return true;
+            } catch (Throwable t) {
+                System.out.println("[DJ] PianoAPI failed: " + t.getMessage());
+            }
+        }
+
+        
+        if (!libReady) initLib();
+        Object evt = libCache.get(id);
+        if (evt != null) {
+            try {
+                SoundEvent soundEvent = (SoundEvent) evt;
+                if (inWorld) {
+                    mcPlay.invoke(m.level, m.player.blockPosition(), evt, mcSrc, 2f, 1f, true);
+                    System.out.println("[DJ] PianoLib noteId=" + id + "(" + nameOfId(id) + ") [world]");
+                } else {
+                    
+                    SimpleSoundInstance inst = SimpleSoundInstance.forUI(soundEvent, 1.0f, 1.0f);
+                    m.getSoundManager().play(inst);
+                    System.out.println("[DJ] PianoLib noteId=" + id + "(" + nameOfId(id) + ") [mainmenu] inst=" + inst);
+                }
+                return true;
+            } catch (Throwable t) {
+                System.out.println("[DJ] PianoLib play failed: " + t.getMessage());
+                t.printStackTrace();
+            }
+        } else {
+            System.out.println("[DJ] no cache for noteId=" + id + "(" + nameOfId(id) + ")");
+        }
+
+        
+        try {
+            int midiNote = id + 60;
+            int useCount = midiNote - 54;
+            if (useCount >= 0 && useCount <= 24) {
+                float pitch = clampF((float) Math.pow(2.0, (useCount - 12) / 12.0), 0.5f, 2.0f);
+                if (inWorld) {
+                    m.level.playSound(m.player, m.player.blockPosition(),
+                        SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 2.0f, pitch);
+                    System.out.println("[DJ] Fallback HARP noteId=" + id + " pitch=" + pitch + " [world]");
+                } else {
+                    
+                    SimpleSoundInstance inst = SimpleSoundInstance.forUI(
+                        SoundEvents.NOTE_BLOCK_HARP.value(), 1.0f, pitch);
+                    m.getSoundManager().play(inst);
+                    System.out.println("[DJ] Fallback HARP noteId=" + id + " pitch=" + pitch + " [mainmenu] inst=" + inst);
+                }
+                return true;
+            }
+        } catch (Throwable t) {
+            System.out.println("[DJ] Fallback HARP failed: " + t.getMessage());
+        }
+        return false;
+    }
+    /** MIDI 回放专用发声：与 playLib 同通路（PianoAPI → libCache → HARP），静默不刷日志 */
+    private static void playQuiet(int id, float vol) {
+        if (id < NOTE_ID_A0 || id > NOTE_ID_C8) return;
+        Minecraft m = Minecraft.getInstance();
+        if (m == null) return;
+        vol = clampF(vol, 0.15f, 1.0f);
+        boolean inWorld = m.level != null && m.player != null;
+
+        if (inWorld && isPianoAPIAvail() && apiPlay != null) {
+            try { apiPlay.invoke(null, id + PIANO_KEY_CENTER, vol); return; }
+            catch (Throwable ignored) {}
+        }
+        if (!libReady) initLib();
+        Object evt = libCache.get(id);
+        if (evt != null) {
+            try {
+                if (inWorld && mcPlay != null) {
+                    mcPlay.invoke(m.level, m.player.blockPosition(),
+                            evt, mcSrc, 2f * vol, 1f, true);
+                } else {
+                    m.getSoundManager().play(
+                            SimpleSoundInstance.forUI((SoundEvent) evt, 1.0f, vol));
+                }
+                return;
+            } catch (Throwable ignored) {}
+        }
+        try {
+            int midiNote = id + 60;
+            int useCount = midiNote - 54;
+            if (useCount >= 0 && useCount <= 24) {
+                float pitch = clampF((float) Math.pow(2.0, (useCount - 12) / 12.0), 0.5f, 2.0f);
+                if (inWorld) {
+                    m.level.playSound(m.player, m.player.blockPosition(),
+                            SoundEvents.NOTE_BLOCK_HARP.value(),
+                            SoundSource.RECORDS, 2.0f * vol, pitch);
+                } else {
+                    m.getSoundManager().play(SimpleSoundInstance.forUI(
+                            SoundEvents.NOTE_BLOCK_HARP.value(), 1.0f, pitch));
+                }
+            }
+        } catch (Throwable ignored) {}
+    }
+    private static synchronized void initRef() {
+        if (refDone) return;
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            Class<?> mcC = mc.getClass();
+            try { gwM = mcC.getMethod("getWindow"); } catch (NoSuchMethodException e1) {
+                try { gwM = mcC.getMethod("getMainWindow"); } catch (NoSuchMethodException e2) {
+                    for (Method m : mcC.getMethods())
+                        if (m.getParameterCount()==0 && m.getReturnType().getSimpleName().equals("Window"))
+                            { gwM = m; break; }
+                }
+            }
+            if (gwM != null) {
+                Object wo = gwM.invoke(mc);
+                if (wo != null) {
+                    Class<?> wc = wo.getClass();
+                    for (String s : new String[]{"getHandle","getWindow","longValue"})
+                        try { ghM = wc.getMethod(s); break; } catch (NoSuchMethodException ignored) {}
+                    if (ghM == null)
+                        for (Method m : wc.getMethods())
+                            if (m.getParameterCount()==0 && m.getReturnType()==long.class)
+                                { ghM = m; break; }
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        refDone = true;
+    }
+
+    private long getWin() {
+        try {
+            initRef();
+            if (gwM == null || ghM == null) return 0L;
+            Object wo = gwM.invoke(minecraft);
+            if (wo == null) return 0L;
+            Object r = ghM.invoke(wo);
+            return r instanceof Long ? (long)r : 0L;
+        } catch (Exception e) {
+            try {
+                Object w = minecraft.getClass().getMethod("getWindow").invoke(minecraft);
+                if (w != null) {
+                    Object h = w.getClass().getMethod("getHandle").invoke(w);
+                    return h instanceof Long ? (long)h : 0L;
+                }
+            } catch (Exception x) { x.printStackTrace(); }
+            return 0L;
+        }
+    }
+
+    private boolean isSurvival() {
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.gameMode == null) return false;
+            GameType m = mc.gameMode.getPlayerMode();
+            return m != null && m.isSurvival();
+        } catch (Exception e) { return false; }
+    }
+
+    private void scanNB() {
+        try {
+            Minecraft c = Minecraft.getInstance();
+            if (c.level == null || c.player == null) return;
+            if (++scanTick % 40 != 0 && nbReady) return;
+            nbCache.clear();
+            BlockPos p0 = c.player.blockPosition();
+            for (int dx = -8; dx <= 8; dx++)
+                for (int dy = -2; dy <= 2; dy++)
+                    for (int dz = -8; dz <= 8; dz++) {
+                        BlockPos p = p0.offset(dx, dy, dz);
+                        BlockState s = c.level.getBlockState(p);
+                        if (s.getBlock() instanceof NoteBlock) {
+                            int v = s.getValue(BlockStateProperties.NOTE);
+                            if (!nbCache.containsKey(v)) nbCache.put(v, p);
+                        }
+                    }
+            nbReady = true;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    /**
+     * 钢琴 noteId（0 = C4 = MIDI 60）→ 音符盒 note 值（0 = F#3 = MIDI 54）。
+     * 两套体系 0 点差 6 个半音 —— 这就是「弹 C4 外面响 #F」的根因：
+     * 原实现直接拿钢琴 id 去查 nbCache（里面存的是音符盒 note 值），
+     * 于是 C4(id=0) 查到 note=0 → MIDI 54 = F#3，正好偏了 6 个半音。
+     */
+    private static int toBlockNote(int id) {
+        int midi = id + 60;                  // 钢琴 id → MIDI
+        while (midi < 54) midi += 12;        // 八度折叠进音符盒可播区 MIDI 54..78
+        while (midi > 78) midi -= 12;
+        return midi - 54;                    // → 0..24（BlockStateProperties.NOTE 取值）
+    }
+
+    private BlockPos findNB(int id) {
+        try {
+            if (!nbReady) scanNB();
+            int note = toBlockNote(id);
+            BlockPos p = nbCache.get(note);
+            if (p != null) return p;
+            // 该音没摆盒子 → 退到八度等价音（音名相同，只是差一个八度），
+            // 不会再出现「弹 C 响 F#」这种音名错位。
+            if (note - 12 >= 0)  { p = nbCache.get(note - 12); if (p != null) return p; }
+            if (note + 12 <= 24) { p = nbCache.get(note + 12); if (p != null) return p; }
+        } catch (Exception e) {}
+        return null;
+    }
+
+    /** 手动弹琴：保留 50ms 节流 + 挥手动画（人手不可能弹得比 50ms 更密） */
+    private void broadcastNB(int id) {
+        try {
+            if (minecraft.player == null || minecraft.level == null) return;
+            long now = System.currentTimeMillis();
+            if (now - lastPkt < PKT_INT) return;
+            lastPkt = now;
+            sendNB(id, true);
+        } catch (Exception e) {}
+    }
+
+    /**
+     * MIDI 回放：不按时间节流 —— 和弦/密集琶音必须在同一帧全部发出去，
+     * 用 50ms 节流会大量吞音。改由调用方按帧限量（MAX_MIDI_PKT_PER_TICK）。
+     */
+    private void broadcastNBMidi(int id) {
+        try {
+            if (minecraft.player == null || minecraft.level == null) return;
+            sendNB(id, false);
+        } catch (Exception e) {}
+    }
+
+    /** 实际发包：START_DESTROY_BLOCK 左键交互音符盒 */
+    private void sendNB(int id, boolean swing) {
+        try {
+            BlockPos t = findNB(id);
+            if (t == null) return;
+            minecraft.player.connection.send(new ServerboundPlayerActionPacket(
+                ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, t, Direction.UP, 0));
+            if (swing) minecraft.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            // \u2605 \u5f55\u5236\u4e2d\uff1a\u672c mod \u53d1\u51fa\u7684\u97f3\u4e00\u5b9a\u8bb0\u5f55\u4e0b\u6765\u2014\u2014
+            //   \u5305\u94a9\u5b50\u6ce8\u518c\u5931\u8d25\u65f6\u7684\u964d\u7ea7\u8def\u5f84\uff0c\u4fdd\u8bc1\u81ea\u5df1\u5f39\u7434 / MIDI \u5e7f\u64ad\u4e0d\u4f1a\u6f0f\u5f55\u3002
+            NbsRecorder.onNoteBlockEvent(t, 0L);
+        } catch (Exception e) {}
+    }
+
+    @Override
+    protected void init() {
+        try {
+            keyState.clear();
+            heldKeys.clear();
+            shift = 0;
+            isPianoAPIAvail();
+            initLib();
+            scanNB();
+
+            int rx = width - 10;
+
+            sndBtn = Button.builder(
+                    Component.literal(broadcast ? "\uD83D\uDD0A" : "\uD83D\uDD08"),
+                    b -> {
+                        if (broadcast) { broadcast = false; b.setMessage(Component.literal("\uD83D\uDD08")); }
+                        else if (isSurvival()) { broadcast = true; b.setMessage(Component.literal("\uD83D\uDD0A")); }
+                    })
+                .pos(rx - TS*2 - 4, TY).size(TS, TS).build();
+            addRenderableWidget(sndBtn);
+
+            addRenderableWidget(Button.builder(Component.literal("X"), b -> {
+                if (MIDI_REC.isRecording()) {
+                    String path = getRecordingsDir() + "/piano_" + System.currentTimeMillis() + ".mid";
+                    boolean ok = MIDI_REC.stopAndSave(path);
+                    System.out.println("[DJ] MIDI auto-save on close=" + ok + " path=" + path);
+                }
+                nbReady = false; nbCache.clear();
+                Main.setScreenCompatStatic(minecraft, parent);
+            }).pos(rx - TS, TY).size(TS, TS).build());
+
+            recBtn = Button.builder(
+                    Component.literal(MIDI_REC.isRecording() ? "\u25CF STOP" : "\u25CF REC"),
+                    b -> {
+                        if (MIDI_REC.isRecording()) {
+                            String path = getRecordingsDir() + "/piano_" + System.currentTimeMillis() + ".mid";
+                            boolean ok = MIDI_REC.stopAndSave(path);
+                            System.out.println("[DJ] MIDI save=" + ok + " path=" + path);
+                            b.setMessage(Component.literal("\u25CF REC"));
+                        } else {
+                            MIDI_REC.start();
+                            System.out.println("[DJ] MIDI recording START");
+                            b.setMessage(Component.literal("\u25CF STOP"));
+                        }
+                        updateRecBtnColor(b);
+                    })
+                .pos(REC_BTN_X, REC_BTN_Y).size(REC_BTN_W, REC_BTN_H).build();
+            updateRecBtnColor(recBtn);
+            addRenderableWidget(recBtn);
+            midiFiles = MidiPlayback.listFiles();
+            if (midiFileIndex >= midiFiles.size()) midiFileIndex = 0;
+
+            playMidiButton = Button.builder(
+                    Component.literal(MIDI_PLAY.isPlaying() ? "■ STOP" : "▶ PLAY"),
+                    b -> {
+                        if (MIDI_PLAY.isPlaying()) { stopMidiUI(); return; }
+                        if (midiFiles.isEmpty()) {
+                            minecraft.gui.chatListener().handleSystemMessage(
+                                    Component.literal("§c[DiscJockey] 没有 .mid 文件："
+                                            + MidiPlayback.dir().getAbsolutePath()), false);
+                            return;
+                        }
+                        if (MIDI_PLAY.start(midiFiles.get(midiFileIndex))) {
+                            b.setMessage(Component.literal("■ STOP"));
+                        }
+                    })
+                    .pos(REC_BTN_X + REC_BTN_W + 4, REC_BTN_Y)
+                    .size(60, REC_BTN_H).build();
+            addRenderableWidget(playMidiButton);
+
+            String fn = midiFiles.isEmpty() ? "(no midi)"
+                    : midiFiles.get(midiFileIndex).getName();
+            if (fn.length() > 12) fn = fn.substring(0, 11) + "…";
+            midiFileButton = Button.builder(Component.literal("♪ " + fn), b -> {
+                if (midiFiles.isEmpty()) return;
+                midiFileIndex = (midiFileIndex + 1) % midiFiles.size();
+                String n = midiFiles.get(midiFileIndex).getName();
+                if (n.length() > 12) n = n.substring(0, 11) + "…";
+                b.setMessage(Component.literal("♪ " + n));
+                if (MIDI_PLAY.isPlaying()) MIDI_PLAY.start(midiFiles.get(midiFileIndex));
+            }).pos(REC_BTN_X + REC_BTN_W + 68, REC_BTN_Y)
+              .size(90, REC_BTN_H).build();
+            addRenderableWidget(midiFileButton);
+
+            // ==================== 录制NBS ====================
+            // 点一下：以玩家为中心、按 R 半径开始录制，并【退出界面】回到游戏；
+            // 再点一下：停止并保存为 .nbs，同样【退出界面】。
+            // 半径用下方工具行的 R- / R: / R+ 调（1..16，录制中也可改，立即生效）。
+            recNbsBtn = Button.builder(
+                    Component.translatable(NbsRecorder.isRecording()
+                            ? "disc_jockey.screen.record_noteblock_song.stop"
+                            : "disc_jockey.screen.record_noteblock_song"),
+                    b -> {
+                        if (NbsRecorder.isRecording()) {
+                            String savedName = NbsRecorder.stopAndSave();
+                            if (savedName != null) {
+                                showRecMsg("\u00a7a[DiscJockey] \u5f55\u5236\u5df2\u4fdd\u5b58\uff1a" + savedName);
+                            } else {
+                                showRecMsg("\u00a7c[DiscJockey] \u5f55\u5236\u7ed3\u675f\uff0c\u4f46\u6ca1\u6709\u6355\u83b7\u5230\u97f3\u7b26\u76d2\u53d1\u58f0");
+                            }
+                        } else {
+                            // \u70b9\u51fb\u65f6\u4e3b\u52a8\u8bfb\u4e00\u6b21\u8f93\u5165\u6846\uff1a\u9632\u6b62\u6700\u540e\u4e00\u6b21\u8f93\u5165\u6ca1\u89e6\u53d1 responder
+                            if (recNameBox != null) NbsRecorder.setCustomName(recNameBox.getValue());
+                            if (recRadiusBox != null) {
+                                try {
+                                    NbsRecorder.setRadius(Integer.parseInt(recRadiusBox.getValue().trim()));
+                                } catch (NumberFormatException ignored) { }
+                            }
+                            BlockPos recCenter = (minecraft.player != null)
+                                    ? minecraft.player.blockPosition() : BlockPos.ZERO;
+                            NbsRecorder.start(recCenter, NbsRecorder.getRadius());
+                            String nm = NbsRecorder.getCustomName();
+                            showRecMsg("\u00a7a[DiscJockey] \u5f00\u59cb\u5f55\u5236\u97f3\u7b26\u76d2\uff08\u534a\u5f84 "
+                                    + NbsRecorder.getRadius()
+                                    + "\uff0c\u901f\u5ea6 " + tempoLabel()
+                                    + (nm != null ? ("\uff0c\u540d\u5b57 " + nm) : "")
+                                    + "\uff09");
+                        }
+                        // \u4e24\u79cd\u60c5\u51b5\u90fd\u9000\u51fa\u754c\u9762\uff0c\u56de\u5230\u6e38\u620f
+                        nbReady = false;
+                        nbCache.clear();
+                        Main.setScreenCompatStatic(minecraft, null);
+                    })
+                    .pos(rx - TS*2 - 4 - REC_NBS_W - 4, TY)
+                    .size(REC_NBS_W, REC_BTN_H).build();
+            addRenderableWidget(recNbsBtn);
+
+            addRenderableWidget(Button.builder(Component.literal("[-]"), b -> addDisp(-1)).pos(KX, BY).size(ICON, ICON).build());
+            addRenderableWidget(Button.builder(Component.literal("[+]"), b -> addDisp(+1)).pos(KX+ICON+4, BY).size(ICON, ICON).build());
+            addRenderableWidget(Button.builder(Component.literal("C4"), b -> setDisp(4)).pos(KX+(ICON+4)*2, BY).size(ICON*2, ICON).build());
+            addRenderableWidget(Button.builder(Component.literal("CLR"), b -> history.clear()).pos(KX+(ICON+4)*4, BY).size(ICON, ICON).build());
+            addRenderableWidget(Button.builder(Component.literal("SCN"), b -> { nbCache.clear(); nbReady=false; scanNB(); }).pos(KX+(ICON+4)*5+ICON, BY).size(ICON, ICON).build());
+
+            // ==================== \u5f55\u5236\u81ea\u5b9a\u4e49\uff1a\u534a\u5f84(\u76f4\u63a5\u8f93\u5165) / \u901f\u5ea6 / \u6587\u4ef6\u540d ====================
+            // \u534a\u5f84\u8303\u56f4 1..64\uff1a\u53ef\u70b9 - / + \u5fae\u8c03\uff0c\u4e5f\u53ef\u5728\u6846\u91cc\u76f4\u63a5\u952e\u5165\u4efb\u610f\u503c
+            int rx0 = KX + (ICON+4)*5 + ICON + (ICON+4);
+
+            addRenderableWidget(Button.builder(Component.literal("-"), b -> {
+                NbsRecorder.setRadius(NbsRecorder.getRadius() - 1);
+                syncRecControls();
+            }).pos(rx0, BY).size(ICON, ICON).build());
+
+            recRadiusBox = new EditBox(font, rx0 + ICON + 4, BY + 2, 40, 18,
+                    Component.literal("R"));
+            recRadiusBox.setMaxLength(3);
+            recRadiusBox.setValue(String.valueOf(NbsRecorder.getRadius()));
+            recRadiusBox.setResponder(t -> {
+                try {
+                    NbsRecorder.setRadius(Integer.parseInt(t.trim()));
+                } catch (NumberFormatException ignored) { }
+            });
+            addRenderableWidget(recRadiusBox);
+
+            addRenderableWidget(Button.builder(Component.literal("+"), b -> {
+                NbsRecorder.setRadius(NbsRecorder.getRadius() + 1);
+                syncRecControls();
+            }).pos(rx0 + ICON + 4 + 40 + 4, BY).size(ICON, ICON).build());
+
+            // \u901f\u5ea6\uff08\u5f55\u5236\u65f6\u9501\u5b9a\uff0c\u4e2d\u9014\u6539\u53ea\u5f71\u54cd\u4e0b\u4e00\u6bb5\uff09
+            int tx0 = rx0 + ICON + 4 + 40 + 4 + ICON + 8;
+            addRenderableWidget(Button.builder(Component.literal("<"), b -> stepTempo(-1))
+                    .pos(tx0, BY).size(ICON, ICON).build());
+
+            recTempoBtn = Button.builder(Component.literal(tempoLabel()), b -> { })
+                    .pos(tx0 + ICON + 4, BY).size(64, ICON).build();
+            addRenderableWidget(recTempoBtn);
+
+            addRenderableWidget(Button.builder(Component.literal(">"), b -> stepTempo(+1))
+                    .pos(tx0 + ICON + 4 + 64 + 4, BY).size(ICON, ICON).build());
+
+            // \u6587\u4ef6\u540d\uff08\u7559\u7a7a = \u65f6\u95f4\u6233\uff09
+            int nx0 = tx0 + ICON + 4 + 64 + 4 + ICON + 8;
+            recNameBox = new EditBox(font, nx0, BY + 2, 140, 18,
+                    Component.literal("Name"));
+            recNameBox.setMaxLength(64);
+            recNameBox.setHint(Component.literal("\u6587\u4ef6\u540d(\u7a7a=\u65f6\u95f4\u6233)"));
+            String cn0 = NbsRecorder.getCustomName();
+            recNameBox.setValue(cn0 == null ? "" : cn0);
+            recNameBox.setResponder(t -> NbsRecorder.setCustomName(t));
+            addRenderableWidget(recNameBox);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+
+    // ==================== \u5f55\u5236\u81ea\u5b9a\u4e49\u63a7\u4ef6\u7684\u8f85\u52a9\u65b9\u6cd5 ====================
+
+    /** \u901f\u5ea6\u9884\u8bbe\u6863\u4f4d\uff08tempo\uff0c\u5355\u4f4d 0.01 TPS\uff09 */
+    private static final int[] TEMPO_STEPS = {100, 250, 500, 1000, 1500, 2000, 4000, 10000};
+
+    /** \u901f\u5ea6\u6309\u94ae\u6587\u5b57\uff1a\u663e\u793a TPS\uff08tick/\u79d2\uff09\u66f4\u76f4\u89c2 */
+    private static String tempoLabel() {
+        return "T:" + String.format(java.util.Locale.ROOT, "%.1f", NbsRecorder.ticksPerSecond());
+    }
+
+    /** \u5728\u9884\u8bbe\u6863\u4f4d\u95f4\u524d\u540e\u79fb\u52a8 */
+    private void stepTempo(int dir) {
+        int cur = NbsRecorder.getTempo();
+        int idx = 0, best = Integer.MAX_VALUE;
+        for (int i = 0; i < TEMPO_STEPS.length; i++) {
+            int d = Math.abs(TEMPO_STEPS[i] - cur);
+            if (d < best) { best = d; idx = i; }
+        }
+        int ni = idx + dir;
+        if (ni < 0) ni = TEMPO_STEPS.length - 1;
+        if (ni >= TEMPO_STEPS.length) ni = 0;
+        NbsRecorder.setTempo(TEMPO_STEPS[ni]);
+        syncRecControls();
+    }
+
+    /**
+     * \u628a NbsRecorder \u91cc\u7684\u503c\u56de\u5199\u5230\u63a7\u4ef6\u4e0a\u3002
+     * \u6ce8\u610f\uff1asetValue \u4f1a\u89e6\u53d1 responder\uff0c\u4f46 responder \u91cc\u53ea setXxx \u3001\u4e0d\u518d setValue\uff0c
+     * \u6240\u4ee5\u4e0d\u4f1a\u65e0\u9650\u9012\u5f52\u3002
+     */
+    private void syncRecControls() {
+        if (recRadiusBox != null) {
+            recRadiusBox.setValue(String.valueOf(NbsRecorder.getRadius()));
+        }
+        if (recTempoBtn != null) {
+            recTempoBtn.setMessage(Component.literal(tempoLabel()));
+        }
+    }
+
+    /** \u5f55\u5236\u63d0\u793a\uff1a\u5168\u53cd\u5c04\u517c\u5bb9 26.3 / 26.4 \u7684\u804a\u5929\u901a\u9053 */
+    private void showRecMsg(String text) {
+        try {
+            minecraft.gui.chatListener().handleSystemMessage(
+                    Component.literal(text), false);
+        } catch (Throwable t) {}
+    }
+
+    private void updateRecBtnColor(Button b) {
+        if (b == null) return;
+        if (MIDI_REC.isRecording()) {
+            b.setMessage(Component.literal("\u25CF STOP").copy().withStyle(s -> s.withColor(0xFFFF2222)));
+        } else {
+            b.setMessage(Component.literal("\u25CF REC").copy().withStyle(s -> s.withColor(0xFFAAAAAA)));
+        }
+    }
+
+    private String getRecordingsDir() {
+        String dir = Minecraft.getInstance().gameDirectory.getAbsolutePath() + "/recordings";
+        java.io.File d = new java.io.File(dir);
+        if (!d.exists()) d.mkdirs();
+        return dir;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        try {
+            // --- MIDI 回放事件：Sequencer 线程 → 渲染线程 ---
+            int[] ev;
+            int midiPktThisTick = 0;
+            while ((ev = MIDI_EVENTS.poll()) != null) {
+                if (ev[0] < 0) { stopMidiUI(); continue; }   // 播放结束
+                int noteId = ev[0] - 60;                     // MIDI note → DJ noteId
+
+                // 八度折叠进 A0~C8：playQuiet 对超范围音直接 return，
+                // 若这里不折叠就会出现「外面响、里面没声」的内外不一致。
+                // 折叠后钢琴声与广播音名保持相同（只是差一个八度）。
+                while (noteId < NOTE_ID_A0) noteId += 12;
+                while (noteId > NOTE_ID_C8) noteId -= 12;
+
+                if (ev[2] == 1) {
+                    playQuiet(noteId, ev[1] / 127.0f);
+                    addRoll(noteId);                         // 滚落动画
+                    pressed.put(noteId, true);               // 琴键高亮
+                    // ★ MIDI 回放联动广播：开着喇叭按钮时，MIDI 音符同步敲外面的音符盒
+                    //   每帧限量，和弦能一起出，又不会触发服务器限流
+                    if (broadcast && midiPktThisTick < MAX_MIDI_PKT_PER_TICK) {
+                        broadcastNBMidi(noteId);
+                        midiPktThisTick++;
+                    }
+                } else {
+                    pressed.remove(noteId);
+                }
+            }
+            active.clear();
+            for (int n : pressed.keySet())
+                if (n >= NOTE_ID_A0 && n <= NOTE_ID_C8) active.add(n);
+
+            if (Main.SPECTRUM != null && Main.SPECTRUM.currentLevels != null) {
+                float[] lv = Main.SPECTRUM.currentLevels;
+                for (int i = 0; i < lv.length; i++) lv[i] *= 0.85f;
+                for (int n : active) { int idx = n + 39; if (idx >= 0 && idx < lv.length) lv[idx] = 1f; }
+            }
+
+            List<Note> nh = new ArrayList<>();
+            for (Note r : history) { r.age++; if (r.age < HIST_MAX) nh.add(r); }
+            history.clear(); history.addAll(nh);
+
+            scanNB();
+            boolean k0 = heldKeys.contains(30); // SDL_SCANCODE_1 ('0'键在26.3下不可靠，改用 scancode)
+            if (k0 && !keyState.getOrDefault("K0", false)) {
+                System.out.println("[DJ] 0 -> C4 reset");
+                setDisp(4);
+            }
+            keyState.put("K0", k0);
+
+            boolean k1 = heldKeys.contains(30); // scancode=30 (键'1')
+            if (k1 && !keyState.getOrDefault("K1", false)) {
+                System.out.println("[DJ] 1 -> A0(-39) \u2605");
+                if (playAndRecord(-39)) { addRoll(-39); if (broadcast) broadcastNB(-39); }
+                pressed.put(-39, true);
+            }
+            if (!k1) { pressed.remove(-39); MIDI_REC.noteOff(-39); }
+            keyState.put("K1", k1);
+
+            boolean k2 = heldKeys.contains(31); // scancode=31 (键'2')
+            if (k2 && !keyState.getOrDefault("K2", false)) {
+                System.out.println("[DJ] 2 -> A#0(-38) \u2605");
+                if (playAndRecord(-38)) { addRoll(-38); if (broadcast) broadcastNB(-38); }
+                pressed.put(-38, true);
+            }
+            if (!k2) { pressed.remove(-38); MIDI_REC.noteOff(-38); }
+            keyState.put("K2", k2);
+
+            boolean k3 = heldKeys.contains(32); // scancode=32 (键'3')
+            if (k3 && !keyState.getOrDefault("K3", false)) {
+                System.out.println("[DJ] 3 -> B0(-37) \u2605");
+                if (playAndRecord(-37)) { addRoll(-37); if (broadcast) broadcastNB(-37); }
+                pressed.put(-37, true);
+            }
+            if (!k3) { pressed.remove(-37); MIDI_REC.noteOff(-37); }
+            keyState.put("K3", k3);
+
+            boolean esc = heldKeys.contains(SC_ESC);
+            if (esc && !keyState.getOrDefault("ESC", false)) {
+                if (MIDI_REC.isRecording()) {
+                    String path = getRecordingsDir() + "/piano_" + System.currentTimeMillis() + ".mid";
+                    boolean ok = MIDI_REC.stopAndSave(path);
+                    System.out.println("[DJ] MIDI auto-save on ESC=" + ok + " path=" + path);
+                    if (recBtn != null) updateRecBtnColor(recBtn);
+                }
+                nbReady = false; nbCache.clear();
+                Main.setScreenCompatStatic(minecraft, parent);
+            }
+            keyState.put("ESC", esc);
+
+            for (Map.Entry<Integer, Integer> ent : KEY_MAP.entrySet()) {
+                int key = ent.getKey();
+                String keyName = keyNameOf(key);
+                boolean now = heldKeys.contains(key);
+                boolean was = keyState.getOrDefault("K"+key, false);
+                int noteId = ent.getValue() + shift * 12;
+                boolean ok = noteId >= NOTE_ID_A0 && noteId <= NOTE_ID_C8;
+
+                if (now && !was) {
+                    debugKey(key, "press");
+                    if (ok) {
+                        System.out.println("[DJ] key=" + keyName +
+                            " offset=" + ent.getValue() + " shift=" + shift +
+                            "(+" + getDisp() + ") -> " + noteId + "(" + nameOfId(noteId) + ")");
+                        if (playAndRecord(noteId)) {
+                            addRoll(noteId);
+                            if (broadcast) broadcastNB(noteId);
+                        }
+                        pressed.put(noteId, true);
+                    } else {
+                        System.out.println("[DJ] REJECT noteId=" + noteId + " key=" + keyName);
+                    }
+                }
+                if (!now && was) { pressed.remove(noteId); MIDI_REC.noteOff(noteId); }
+                keyState.put("K"+key, now);
+            }
+
+            boolean ml = minecraft.mouseHandler.isLeftPressed();
+            if (ml && !wasMouseDown) click(minecraft.mouseHandler.xpos(), minecraft.mouseHandler.ypos());
+            if (!ml) {
+                Map<Integer, Boolean> keep = new HashMap<>();
+                keep.put(-39, pressed.getOrDefault(-39, false));
+                keep.put(-38, pressed.getOrDefault(-38, false));
+                keep.put(-37, pressed.getOrDefault(-37, false));
+                for (int k : pressed.keySet()) {
+                    if (k >= NOTE_ID_A0 && k <= NOTE_ID_C8) keep.put(k, pressed.get(k));
+                }
+                pressed.clear();
+                pressed.putAll(keep);
+                for (int k : keep.keySet()) {
+                    if (keep.get(k)) MIDI_REC.noteOff(k);
+                }
+            }
+            wasMouseDown = ml;
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    
+    @Override
+    public boolean keyPressed(KeyEvent evt) {
+        int sc = getScancode(evt);   
+        heldKeys.add(sc);
+        
+        if (sc == SC_LEFT)  { addDisp(-1); System.out.println("[DJ] octave <- " + getDisp()); return true; }
+        if (sc == SC_RIGHT) { addDisp(+1); System.out.println("[DJ] octave -> " + getDisp()); return true; }
+        return super.keyPressed(evt);
+    }
+
+    @Override
+    public boolean keyReleased(KeyEvent evt) {
+        heldKeys.remove(getScancode(evt));   
+        return super.keyReleased(evt);
+    }
+
+    
+    private static int getScancode(Object evt) {
+        if (evt == null) return 0;
+        try {
+            
+            java.lang.reflect.Field f = evt.getClass().getDeclaredField("scancode");
+            f.setAccessible(true);
+            return ((Number) f.get(evt)).intValue();
+        } catch (Throwable ignored) {}
+        try {
+            
+            java.lang.reflect.Method m = evt.getClass().getMethod("scancode");
+            return ((Number) m.invoke(evt)).intValue();
+        } catch (Throwable ignored) {}
+        try {
+            
+            java.lang.reflect.Method m = evt.getClass().getMethod("key");
+            return ((Number) m.invoke(evt)).intValue();
+        } catch (Throwable ignored) {}
+        return 0;
+    }
+
+    private String keyNameOf(int scancode) {
+        String name = SCAN_NAME.get(scancode);
+        if (name != null) return "SC_" + name;
+        return "scancode_" + scancode;
+    }
+
+    
+    private void debugKey(int scancode, String tag) {
+        if (DEBUG_KEYS) {
+            System.out.println("[DJ] " + tag + " scancode=" + scancode + " name=" + keyNameOf(scancode));
+        }
+    }
+
+
+    private boolean playAndRecord(int noteId) {
+        boolean ok = playLib(noteId);
+        if (ok) {
+            int velocity = calcVelocity(noteId);
+            MIDI_REC.noteOn(noteId, velocity);
+        }
+        return ok;
+    }
+
+    private int calcVelocity(int noteId) {
+        int midiNote = noteId + 60;
+        int dist = Math.abs(midiNote - 60);
+        int vel = 100 - (dist / 12) * 8;
+        return Math.max(64, Math.min(110, vel));
+    }
+
+    
+    private void addRoll(int id) {
+        int rw = WKW * TOTAL_WHITE;
+        history.add(new Note(id, ((id - NOTE_ID_A_MIN) * rw) / RW_SPAN, 180));
+    }
+
+    public void extractBackground(GuiGraphicsExtractor c, int mx, int my, float d) {
+        try { super.extractBackground(c, mx, my, d); } catch (Exception e) {}
+    }
+
+    public void extractRenderState(GuiGraphicsExtractor c, int mx, int my, float d) {
+        try {
+            super.extractRenderState(c, mx, my, d);
+
+            c.text(font, Component.literal("[Disc Jockey] Piano \u2014 PianoLib 88-key (A0~C8)"),
+                width/2 - font.width(Component.literal("[Disc Jockey] Piano \u2014 PianoLib 88-key (A0~C8)"))/2, 20, 0xFFFFFFFF, false);
+
+            int aNoteId = 0 + shift * 12;
+            String ot = "OCTAVE: +" + getDisp() + "(int " + shift + ") | A-KEY: " + nameOfId(aNoteId) + " | Range: A0 ~ C8";
+            int oc = (shift == 0) ? 0xFF00FF00 : (shift > 0 ? 0xFFFFFF00 : 0xFF8888FF);
+            c.text(font, Component.literal(ot), width/2 - font.width(Component.literal(ot))/2, 38, oc, false);
+
+            String ht = "1=A0 2=A#0 3=B0 (固定) A=C4 W=C#4 S=D4 E=D#4 D=E4 F=F4 T=F#4 G=G4 Y=G#4 H=A4 | [-][+] = octave | 0 = C4 | ESC = close";
+            c.text(font, Component.literal(ht), width/2 - font.width(Component.literal(ht))/2, 56, 0x666666, false);
+
+            drawRoll(c);
+            drawKeys(c);
+            drawStatus(c);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    
+    private int rollOrigin() {
+        
+        int firstVisibleWhite = WHITE_NOTE_IDS[0] + shift * 12+24;
+        int rw = WKW * TOTAL_WHITE;
+        return ((firstVisibleWhite - NOTE_ID_A_MIN) * rw) / RW_SPAN;
+    }
+
+    
+    private void drawRoll(GuiGraphicsExtractor c) {
+        int rw = WKW * TOTAL_WHITE, rh = RH;
+        
+        int origin = rollOrigin();
+
+        c.fill(KX-1, RY-1, KX+rw+1, RY+rh+1, 0x55444444);
+        c.fill(KX, RY, KX+rw, RY+rh, 0x990A0A0A);
+
+        
+        for (int n = NOTE_ID_A_MIN; n <= NOTE_ID_C8; n++) {
+            int lx = KX + (((n - NOTE_ID_A_MIN) * rw) / RW_SPAN) - origin;
+            if (lx < KX || lx > KX + rw) continue;
+            int a = (n % 12 == 0) ? 0x44 : 0x18;
+            c.fill(lx, RY, lx+1, RY+rh, (a<<24)|0x888888);
+        }
+
+        
+        for (Note r : history) {
+            int bx = KX + r.lx + 1 - origin;
+            if (bx < KX || bx > KX + rw) continue;
+            int by = RY + 2 + (r.age * 3) % (rh - 4);
+            float fade = clampF(1f - (float)r.age / HIST_MAX, 0.1f, 1f);
+            c.fill(bx, by, bx + Math.max(2, rw/40), by+2, color(r.id, (int)(fade * r.iv)));
+        }
+
+        
+        for (int n : active) {
+            int lx = KX + ((n - NOTE_ID_A_MIN) * rw) / RW_SPAN - origin;
+            if (lx < KX || lx > KX + rw) continue;
+            c.fill(lx, RY, lx+2, RY+rh, 0x66FF4444);
+        }
+
+        c.text(font, Component.literal("Piano Roll (A-2~C8)"), KX, RY-14, 0x88FFFFFF, false);
+    }
+
+    private void drawKeys(GuiGraphicsExtractor c) {
+        for (int i = 0; i < TOTAL_WHITE; i++) {
+            int nid = WHITE_NOTE_IDS[i] + shift * 12;
+            int x = KX + i * WKW;
+            int y = KY;
+            boolean pr = pressed.getOrDefault(nid, false);
+            boolean ac = active.contains(nid);
+            boolean inRange = (nid >= NOTE_ID_A0 && nid <= NOTE_ID_C8);
+
+            int col = !inRange ? 0xFFDDDDDD : (pr ? 0xFFE8E8E8 : (ac ? 0xFFF0F8E8 : 0xFFFFFFFF));
+            c.fill(x, y, x+WKW, y+WKH, col);
+            c.fill(x+2, y+WKH-2, x+WKW, y+WKH, 0x22000000);
+            c.fill(x, y, x+WKW, y+1, 0xFFAAAAAA);
+            c.fill(x, y, x+1, y+WKH, 0xFFAAAAAA);
+            c.fill(x, y+WKH-1, x+WKW, y+WKH, 0xFF888888);
+            c.fill(x+WKW-1, y, x+WKW, y+WKH, 0xFF888888);
+
+            String label = labelForWhite(i);
+            int lblColor;
+            if (nid == -39)         { label = "\u2605A0\u2605"; lblColor = 0xFF00FF00; }
+            else if (nid == 0)      { label = "\u2605C4\u2605"; lblColor = 0xFFFFFF00; }
+            else if (nid == 9)     { label = "A4";          lblColor = 0xFFFF8800; }
+            else if (!inRange)      { lblColor = 0xFF666666; }
+            else                     { lblColor = 0xFF333333; }
+
+            c.text(font, Component.literal(label),
+                x + WKW/2 - font.width(Component.literal(label))/2,
+                y + WKH - 16, lblColor, false);
+
+            if (ac && inRange) c.fill(x+2, y+2, x+WKW-2, y+5, 0x6600FF66);
+        }
+
+        for (int i = 0; i < TOTAL_BLACK; i++) {
+            int nid = BLACK_NOTE_IDS[i] + shift * 12;
+            int aw = BLACK_AFTER_WHITE[i];
+            int x = KX + aw * WKW + WKW - BKW/2;
+            int y = KY;
+            boolean pr = pressed.getOrDefault(nid, false);
+            boolean ac = active.contains(nid);
+            boolean inRange = (nid >= NOTE_ID_A0 && nid <= NOTE_ID_C8);
+
+            int col = !inRange ? 0xFF2A2A2A : (pr ? 0xFF555555 : (ac ? 0xFF334433 : 0xFF1A1A1A));
+            c.fill(x, y, x+BKW, y+BKH, col);
+            if (!pr) c.fill(x+2, y+2, x+BKW-2, y+4, 0xFF3A3A3A);
+            c.fill(x+2, y+BKH-3, x+BKW-2, y+BKH-1, 0xFF0A0A0A);
+
+            String label = labelForBlack(i);
+            int lblColor = inRange ? 0xFF888888 : 0xFF555555;
+            c.text(font, Component.literal(label),
+                x+BKW/2 - font.width(Component.literal(label))/2,
+                y+BKH-14, lblColor, false);
+            if (ac && inRange) c.fill(x+2, y+2, x+BKW-2, y+5, 0x8800FF66);
+        }
+
+        int firstNid = 0 + shift * 12;
+        int fi = -1, li = -1;
+        for (int i = 0; i < TOTAL_WHITE; i++) {
+            int cur = WHITE_NOTE_IDS[i] + shift * 12;
+            if (cur == firstNid && fi < 0) fi = i;
+            if (li < 0 && cur >= firstNid + 12) li = i;
+        }
+        if (fi < 0) {
+            int best = 0, bestDiff = 999;
+            for (int i = 0; i < TOTAL_WHITE; i++) {
+                int d = Math.abs((WHITE_NOTE_IDS[i] + shift * 12) - firstNid);
+                if (d < bestDiff) { bestDiff = d; best = i; }
+            }
+            fi = best;
+        }
+        if (li < 0 || li <= fi) {
+            li = TOTAL_WHITE - 1;
+        }
+        if (fi >= 0) {
+            int sx1 = KX + fi * WKW;
+            int sx2 = KX + (li + 1) * WKW;
+            c.fill(sx1, KY-4, sx2, KY-2, 0x6600AAFF);
+            c.fill(sx1, KY+WKH+2, sx2, KY+WKH+4, 0x6600AAFF);
+        }
+
+        c.fill(KX + C4_INDEX*WKW, KY-6, KX + C4_INDEX*WKW+2, KY, 0xFFFFFF00);
+        for (int i = 0; i < TOTAL_WHITE; i++) if (WHITE_NOTE_IDS[i] == 9) {
+            c.fill(KX + i*WKW, KY-6, KX + i*WKW+2, KY, 0xFFFF8800);
+            break;
+        }
+        c.fill(KX, KY-6, KX+2, KY, 0xFFFF0000);
+    }
+
+    private void drawStatus(GuiGraphicsExtractor c) {
+        StringBuilder sb = new StringBuilder();
+        int aNoteId = 0 + shift * 12;
+        sb.append("Octave: +").append(getDisp()).append("(int ").append(shift).append(") | ");
+        sb.append("A-Key: ").append(nameOfId(aNoteId)).append(" | ");
+        sb.append("Keys: ").append(TOTAL_WHITE).append("/52 | ");
+        sb.append("Lib: ").append(String.valueOf(libCache.size())).append("/88").append(libReady ? "" : " (LOADING...)").append(" | ");
+        sb.append("API: ").append(apiOK==null?"?":(apiOK?"ON":"OFF")).append(" | ");
+        sb.append("BCast: ").append(broadcast?"ON":"OFF").append(" | ");
+        if (MIDI_REC.isRecording()) {
+            sb.append("REC: ON(").append(MIDI_REC.getNoteCount()).append(") | ");
+            sb.append("Sustain: ON | Reverb: ON | ADSR: ON");
+        } else {
+            sb.append("REC: OFF");
+        }
+        sb.append(" | NB: ").append(nbCache.size());
+        if (NbsRecorder.isRecording()) {
+            sb.append(" | NBS-REC: ON(").append(NbsRecorder.noteCount())
+              .append(" notes, ").append(String.format(Locale.ROOT, "%.1f", NbsRecorder.elapsedSeconds()))
+              .append("s, R=").append(NbsRecorder.getRadius()).append(")");
+        }
+        if (!active.isEmpty()) {
+            sb.append(" | ");
+            for (int n : active) {
+                sb.append(nameOfId(n)).append(" ");
+            }
+        }
+        c.text(font, Component.literal(sb.toString()), KX, SY, 0x88FFFFFF, false);
+
+        if (MIDI_REC.isRecording()) {
+            long t = System.currentTimeMillis();
+            int alpha = 120 + (int)(60 * Math.sin(t / 200.0));
+            int barW = 200;
+            int barX = width/2 - barW/2;
+            c.fill(barX, 4, barX + barW, 6, (alpha<<24)|0xFFFF2222);
+            c.text(font, Component.literal("\u25CF RECORDING MIDI \u2014 Sustain+Reverb+ADSR"),
+                barX + barW/2 - font.width(Component.literal("\u25CF RECORDING MIDI \u2014 Sustain+Reverb+ADSR"))/2,
+                8, 0xFFFF2222, false);
+        }
+    }
+
+    private void click(double mx, double my) {
+        int x0 = KX;
+        if (mx >= x0 && mx < x0+WKW && my >= KY && my < KY+WKH) {
+            if (-39 >= NOTE_ID_A0 && -39 <= NOTE_ID_C8) {
+                System.out.println("[DJ] click A0(-39) \u2605");
+                if (playAndRecord(-39)) { addRoll(-39); if (broadcast) broadcastNB(-39); }
+                pressed.put(-39, true);
+            }
+            return;
+        }
+        int xA0s = KX + 0*WKW + WKW - BKW/2;
+        if (mx >= xA0s && mx < xA0s+BKW && my >= KY && my < KY+BKH) {
+            if (-38 >= NOTE_ID_A0 && -38 <= NOTE_ID_C8) {
+                System.out.println("[DJ] click A#0(-38) \u2605");
+                if (playAndRecord(-38)) { addRoll(-38); if (broadcast) broadcastNB(-38); }
+                pressed.put(-38, true);
+            }
+            return;
+        }
+        int x1 = KX + 1*WKW;
+        if (mx >= x1 && mx < x1+WKW && my >= KY && my < KY+WKH) {
+            if (-37 >= NOTE_ID_A0 && -37 <= NOTE_ID_C8) {
+                System.out.println("[DJ] click B0(-37) \u2605");
+                if (playAndRecord(-37)) { addRoll(-37); if (broadcast) broadcastNB(-37); }
+                pressed.put(-37, true);
+            }
+            return;
+        }
+
+        for (int i = 0; i < TOTAL_BLACK; i++) {
+            int nid = BLACK_NOTE_IDS[i] + shift * 12;
+            int x = KX + BLACK_AFTER_WHITE[i] * WKW + WKW - BKW/2;
+            if (mx >= x && mx < x+BKW && my >= KY && my < KY+BKH) {
+                if (nid >= NOTE_ID_A0 && nid <= NOTE_ID_C8) {
+                    System.out.println("[DJ] click BLACK " + nid + "(" + nameOfId(nid) + ")");
+                    if (playAndRecord(nid)) { addRoll(nid); if (broadcast) broadcastNB(nid); }
+                    pressed.put(nid, true);
+                }
+                return;
+            }
+        }
+        for (int i = 0; i < TOTAL_WHITE; i++) {
+            int nid = WHITE_NOTE_IDS[i] + shift * 12;
+            int x = KX + i * WKW;
+            if (mx >= x && mx < x+WKW && my >= KY && my < KY+WKH) {
+                if (nid >= NOTE_ID_A0 && nid <= NOTE_ID_C8) {
+                    System.out.println("[DJ] click WHITE " + nid + "(" + nameOfId(nid) + ")");
+                    if (playAndRecord(nid)) { addRoll(nid); if (broadcast) broadcastNB(nid); }
+                    pressed.put(nid, true);
+                }
+                return;
+            }
+        }
+    }
+
+    
+    private int color(int id, int a) {
+        a = clampI(a, 30, 255);
+        float t = (float)(id - NOTE_ID_A_MIN) / RW_SPAN;
+        int r, g, b;
+        if (t < 0.33f) { r=255; g=(int)(100+155*t/0.33f); b=50; }
+        else if (t < 0.66f) { r=(int)(255-155*(t-0.33f)/0.33f); g=255; b=50; }
+        else { r=(int)(100-50*(t-0.66f)/0.34f); g=(int)(255-100*(t-0.66f)/0.34f); b=(int)(100+155*(t-0.66f)/0.34f); }
+        return (a<<24)|((r&0xFF)<<16)|((g&0xFF)<<8)|(b&0xFF);
+    }
+
+    @Override
+    public boolean isPauseScreen() { return false; }
+/** 用 Sequencer 解析 .mid，把音符事件转成 DJ noteId 推给 PianoLib。纯 javax.sound.midi，无 MC 依赖 */
+    private static class MidiPlayback {
+        static java.io.File dir() {
+            java.io.File base = (Main.songsFolder != null)
+                    ? Main.songsFolder.getParentFile() : null;
+            return new java.io.File(base, "midi");
+        }
+
+        static java.util.List<java.io.File> listFiles() {
+            java.util.List<java.io.File> out = new java.util.ArrayList<>();
+            try {
+                java.io.File d = dir();
+                if (d.isDirectory()) {
+                    java.io.File[] fs = d.listFiles(f -> f.isFile()
+                            && (f.getName().toLowerCase().endsWith(".mid")
+                             || f.getName().toLowerCase().endsWith(".midi")));
+                    if (fs != null) {
+                        out.addAll(java.util.Arrays.asList(fs));
+                        out.sort(java.util.Comparator.comparing(java.io.File::getName));
+                    }
+                }
+            } catch (Throwable ignored) {}
+            return out;
+        }
+
+        private javax.sound.midi.Sequencer sequencer;
+        private java.io.File current;
+        private volatile boolean playing;
+
+        boolean isPlaying() { return playing && sequencer != null && sequencer.isRunning(); }
+        java.io.File current() { return current; }
+
+        /** false = 不接 Java 自带合成器，只把事件转给自定义 Receiver（避免与 PianoLib 双份发声） */
+        boolean start(java.io.File file) {
+            stop();
+            if (file == null || !file.isFile()) return false;
+            try {
+                javax.sound.midi.Sequence seq = javax.sound.midi.MidiSystem.getSequence(file);
+                javax.sound.midi.Sequencer s = javax.sound.midi.MidiSystem.getSequencer(false);
+                if (s == null) return false;
+                s.open();
+                s.setSequence(seq);
+                s.getTransmitter().setReceiver(new javax.sound.midi.Receiver() {
+                    @Override public void send(javax.sound.midi.MidiMessage msg, long ts) {
+                        if (!(msg instanceof javax.sound.midi.ShortMessage sm)) return;
+                        if (sm.getChannel() == 9) return;          // 打击乐轨跳过
+                        int cmd = sm.getCommand();
+                        int d1 = sm.getData1();
+                        int d2 = sm.getData2();
+                        if (cmd == javax.sound.midi.ShortMessage.NOTE_ON && d2 > 0) {
+                            MIDI_EVENTS.offer(new int[]{d1, d2, 1});
+                        } else if (cmd == javax.sound.midi.ShortMessage.NOTE_OFF
+                                || (cmd == javax.sound.midi.ShortMessage.NOTE_ON && d2 == 0)) {
+                            MIDI_EVENTS.offer(new int[]{d1, 0, 0});
+                        }
+                    }
+                    @Override public void close() {}
+                });
+                s.addMetaEventListener(meta -> {
+                    if (meta.getType() == 0x2F) {                  // End of Track
+                        playing = false;
+                        MIDI_EVENTS.offer(new int[]{-1, 0, 0});
+                    }
+                });
+                s.start();
+                sequencer = s;
+                current = file;
+                playing = true;
+                System.out.println("[DJ] MIDI PLAY start: " + file.getName());
+                return true;
+            } catch (Throwable t) {
+                System.out.println("[DJ] MIDI PLAY failed: " + t.getMessage());
+                stop();
+                return false;
+            }
+        }
+
+        void stop() {
+            playing = false;
+            try {
+                if (sequencer != null) {
+                    if (sequencer.isRunning()) sequencer.stop();
+                    sequencer.close();
+                }
+            } catch (Throwable ignored) {}
+            sequencer = null;
+            MIDI_EVENTS.clear();
+        }
+    }
+    
+    private static class MidiRecorder {
+        private static final int PPQ = 480;
+        private static final int CHANNEL = 0;
+        private static final int BPM = 120;
+
+        private static final int PROGRAM_GRAND_PIANO = 0;
+
+        private static final int SUSTAIN_PEDAL_CC = 64;
+        private static final int REVERB_DEPTH_CC  = 91;
+        private static final int REVERB_LEVEL_CC  = 93;
+        private static final int EXPRESSION_CC    = 11;
+        private static final int VOLUME_CC        = 7;
+
+        private static final long MIN_DUR_MS = 150;
+        private static final long RELEASE_MS = 800;
+        private static final long LOW_NOTE_RELEASE_MS = 2000;
+        private static final long HIGH_NOTE_RELEASE_MS = 500;
+
+        private Sequence sequence;
+        private Track track;
+        private long startTimeMs;
+        private boolean recording;
+        private int noteCount;
+
+        private final Map<Integer, Integer> pressCount = new HashMap<>();
+        private final Map<Integer, Long> pressMs = new HashMap<>();
+        private long lastTick = 0;
+
+        void start() {
+            try {
+                sequence = new Sequence(Sequence.PPQ, PPQ);
+                track = sequence.createTrack();
+
+                addProgramChange(PROGRAM_GRAND_PIANO);
+                addControlChange(SUSTAIN_PEDAL_CC, 127);
+                addControlChange(REVERB_DEPTH_CC, 50);
+                addControlChange(REVERB_LEVEL_CC, 40);
+                addControlChange(VOLUME_CC, 110);
+                addControlChange(EXPRESSION_CC, 120);
+
+                addTempo(BPM);
+
+                startTimeMs = System.currentTimeMillis();
+                recording = true;
+                noteCount = 0;
+                pressCount.clear();
+                pressMs.clear();
+                lastTick = 0;
+                System.out.println("[MIDI] Recording START (PPQ=" + PPQ + ", BPM=" + BPM
+                    + ", Program=GrandPiano(0), Sustain=ON, Reverb=ON)");
+            } catch (InvalidMidiDataException t) {
+                recording = false;
+                t.printStackTrace();
+            }
+        }
+
+        private int toMidiNote(int noteId) {
+            return noteId + 60;
+        }
+
+        private long calcReleaseMs(int noteId) {
+            int mnote = noteId + 60;
+            if (mnote < 36)  return LOW_NOTE_RELEASE_MS;
+            if (mnote < 60)  return 1200;
+            if (mnote < 84)  return RELEASE_MS;
+            return HIGH_NOTE_RELEASE_MS;
+        }
+
+        void noteOn(int pianoLibId, int velocity) {
+            if (!recording) return;
+            int mnote = toMidiNote(pianoLibId);
+            if (mnote < 0 || mnote > 127) {
+                System.out.println("[MIDI] REJECT noteId=" + pianoLibId + " midi=" + mnote + " out of range");
+                return;
+            }
+
+            long nowMs = System.currentTimeMillis();
+            long tick = msToTick(nowMs - startTimeMs);
+
+            int count = pressCount.getOrDefault(mnote,0);
+            pressCount.put(mnote, count + 1);
+            pressMs.put(mnote, nowMs);
+
+            try {
+                ShortMessage on = new ShortMessage();
+                on.setMessage(ShortMessage.NOTE_ON, CHANNEL, mnote, clampVel(velocity));
+                track.add(new MidiEvent(on, tick));
+                noteCount++;
+                System.out.println("[MIDI] NOTE_ON midi=" + mnote + "(" + name(mnote) + ") vel=" + velocity + " tick=" + tick);
+            } catch (InvalidMidiDataException ignored) {}
+        }
+
+        void noteOff(int pianoLibId) {
+            if (!recording) return;
+            int mnote = toMidiNote(pianoLibId);
+            if (mnote < 0 || mnote > 127) return;
+
+            int count = pressCount.getOrDefault(mnote,0);
+            if (count <= 0) return;
+            if (count > 1) {
+                pressCount.put(mnote, count - 1);
+                return;
+            }
+            pressCount.remove(mnote);
+
+            long nowMs = System.currentTimeMillis();
+            Long onMsObj = pressMs.remove(mnote);
+            if (onMsObj == null) return;
+            long onMs = onMsObj;
+
+            long releaseMs = calcReleaseMs(pianoLibId);
+
+            long currentTick = msToTick(nowMs - startTimeMs);
+            long releaseTicks = msToTick(releaseMs);
+            long onTick = msToTick(onMs - startTimeMs);
+            long offTick = currentTick + releaseTicks;
+
+            if (offTick <= onTick + msToTick(MIN_DUR_MS)) offTick = onTick + msToTick(MIN_DUR_MS);
+
+            try {
+                long fadeTick = currentTick + msToTick(releaseMs / 3);
+                if (fadeTick > onTick + msToTick(MIN_DUR_MS) && fadeTick < offTick) {
+                    ShortMessage fade = new ShortMessage();
+                    fade.setMessage(ShortMessage.NOTE_ON, CHANNEL, mnote, clampVel(20));
+                    track.add(new MidiEvent(fade, fadeTick));
+                }
+
+                ShortMessage off = new ShortMessage();
+                off.setMessage(ShortMessage.NOTE_OFF, CHANNEL, mnote, 0);
+                track.add(new MidiEvent(off, offTick));
+                System.out.println("[MIDI] NOTE_OFF midi=" + mnote + " dur=" + (offTick - onTick) + "t release=" + releaseMs + "ms");
+            } catch (InvalidMidiDataException ignored) {}
+        }
+
+        boolean stopAndSave(String filePath) {
+            if (!recording) return false;
+            recording = false;
+
+            long endMs = System.currentTimeMillis();
+            long endTick = msToTick(endMs - startTimeMs);
+
+            for (Map.Entry<Integer, Long> e : pressMs.entrySet()) {
+                int mnote = e.getKey();
+                long onMs = e.getValue();
+                long onTick = msToTick(onMs - startTimeMs);
+                long releaseTicks = msToTick(calcReleaseMsFromMidi(mnote));
+                long offTick = Math.max(endTick + 1, onTick + msToTick(MIN_DUR_MS)) + releaseTicks;
+
+                long fadeTick = endTick + msToTick(calcReleaseMsFromMidi(mnote) / 3);
+                if (fadeTick > onTick) {
+                    try {
+                        ShortMessage fade = new ShortMessage();
+                        fade.setMessage(ShortMessage.NOTE_ON, CHANNEL, mnote, 20);
+                        track.add(new MidiEvent(fade, fadeTick));
+                    } catch (InvalidMidiDataException ignored) {}
+                }
+
+                try {
+                    ShortMessage off = new ShortMessage();
+                    off.setMessage(ShortMessage.NOTE_OFF, CHANNEL, mnote, 0);
+                    track.add(new MidiEvent(off, offTick));
+                } catch (InvalidMidiDataException ignored) {}
+                System.out.println("[MIDI] AUTO-OFF midi=" + mnote + " tick=" + offTick);
+            }
+
+            try {
+                ShortMessage pedalUp = new ShortMessage();
+                pedalUp.setMessage(ShortMessage.CONTROL_CHANGE, CHANNEL, SUSTAIN_PEDAL_CC, 0);
+                track.add(new MidiEvent(pedalUp, endTick + 1));
+                System.out.println("[MIDI] Sustain pedal RELEASED");
+            } catch (InvalidMidiDataException ignored) {}
+
+            pressCount.clear();
+            pressMs.clear();
+
+            try {
+                MetaMessage end = new MetaMessage();
+                end.setMessage(0x2F, new byte[0], 0);
+                long lastEvtTick = track.size() > 0
+                    ? track.get(track.size() - 1).getTick() : endTick;
+                long eotTick = Math.max(endTick + 2, lastEvtTick + 1);
+                track.add(new MidiEvent(end, eotTick));
+
+                java.io.File out = new java.io.File(filePath);
+                out.getParentFile().mkdirs();
+                try (FileOutputStream fos = new FileOutputStream(out)) {
+                    MidiSystem.write(sequence, 1, fos);
+                }
+                System.out.println("[MIDI] Saved: " + out.getAbsolutePath()
+                    + " (" + noteCount + " notes, " + eotTick + " ticks, Sustain+Reverb ON)");
+                return true;
+            } catch (InvalidMidiDataException t) {
+                t.printStackTrace();
+                return false;
+            } catch (IOException t) {
+                t.printStackTrace();
+                return false;
+            }
+        }
+
+        private long calcReleaseMsFromMidi(int mnote) {
+            if (mnote < 36)  return LOW_NOTE_RELEASE_MS;
+            if (mnote < 60)  return 1200;
+            if (mnote < 84)  return RELEASE_MS;
+            return HIGH_NOTE_RELEASE_MS;
+        }
+
+        boolean isRecording() { return recording; }
+        int getNoteCount() { return noteCount; }
+
+        private long msToTick(long ms) {
+            double seconds = ms / 1000.0;
+            double beats = seconds * (BPM / 60.0);
+            long tick = (long) (beats * PPQ);
+            if (tick <= lastTick) tick = lastTick + 1;
+            lastTick = tick;
+            return tick;
+        }
+
+        private void addTempo(int bpm) throws InvalidMidiDataException {
+            int mpqn = 60_000_000 / bpm;
+            MetaMessage tempo = new MetaMessage();
+            tempo.setMessage(0x51, new byte[]{
+                (byte) (mpqn >> 16), (byte) (mpqn >> 8), (byte) mpqn
+            }, 3);
+            track.add(new MidiEvent(tempo, 0));
+        }
+
+        private void addProgramChange(int program) throws InvalidMidiDataException {
+            ShortMessage pc = new ShortMessage();
+            pc.setMessage(ShortMessage.PROGRAM_CHANGE, CHANNEL, program, 0);
+            track.add(new MidiEvent(pc, 0));
+            System.out.println("[S MIDI] ProgramChange -> " + program + " (Grand Piano)");
+        }
+
+        private void addControlChange(int controller, int value) {
+            try {
+                ShortMessage cc = new ShortMessage();
+                cc.setMessage(ShortMessage.CONTROL_CHANGE, CHANNEL, controller, value);
+                track.add(new MidiEvent(cc, 0));
+                System.out.println("[MIDI] CC" + controller + " = " + value);
+            } catch (InvalidMidiDataException ignored) {}
+        }
+
+        private int clampVel(int v) { return Math.max(1, Math.min(127, v)); }
+    }
+    private void stopMidiUI() {
+        MIDI_PLAY.stop();
+        pressed.clear();
+        if (playMidiButton != null) playMidiButton.setMessage(Component.literal("▶ PLAY"));
+    }
+
+    @Override
+    public void onClose() {
+        MIDI_PLAY.stop();
+        pressed.clear();
+        super.onClose();
+    }
+}
