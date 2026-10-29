@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Elimina",
   "disc_jockey.editor.sel_all": "Seleziona tutto",
 
-  "creativeTab.disc_jockey": "Scheda Giradischi",
   "disc_jockey.autoplay.off": "🔁 Riproduzione automatica disattivata",
   "disc_jockey.autoplay.on": "🔁 Riproduzione automatica attivata",
   "disc_jockey.button.button_download_nbs": "Scarica NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Trasposizione impostata su: %s",
   "disc_jockey.warning": "⚠ AVVISO: Questo mod potrebbe essere erroneamente rilevato come trucco. Contatta l'amministratore del server prima dell'uso! (Disattivabile nelle impostazioni)",
   "disc_jockey.welcome": "Disc Jockey Plus caricato! Premi J per aprire.",
-  "item.disc_jockey.jukebox_projector": "Proiettore giradischi",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Versione configurazione",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Ritardo inizio riproduzione (secondi)",

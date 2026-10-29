@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Sil",
   "disc_jockey.editor.sel_all": "Tümünü seç",
 
-  "creativeTab.disc_jockey": "Plak Sekmesi",
   "disc_jockey.autoplay.off": "🔁 Otomatik oynatma devre dışı",
   "disc_jockey.autoplay.on": "🔁 Otomatik oynatma etkin",
   "disc_jockey.button.button_download_nbs": "NBS İndir",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpozisyon ayarlandı: %s",
   "disc_jockey.warning": "⚠ UYARI: Bu mod hile olarak yanlışlıkla işaretlenebilir. Kullanmadan önce sunucu yöneticinizle iletişime geçin! (Ayarlar bölümünden devre dışı bırakılabilir)",
   "disc_jockey.welcome": "Disc Jockey Plus yüklendi! Açmak için J'ye bas.",
-  "item.disc_jockey.jukebox_projector": "Plak Projektörü",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Yapılandırma Sürümü",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Oynatma başlangıç gecikmesi (saniye)",

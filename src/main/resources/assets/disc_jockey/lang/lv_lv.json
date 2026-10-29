@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Dzēst",
   "disc_jockey.editor.sel_all": "Atlasīt visu",
 
-  "creativeTab.disc_jockey": "Disku cilne",
   "disc_jockey.autoplay.off": "🔁 Automātiskā atskaņošana izslēgta",
   "disc_jockey.autoplay.on": "🔁 Automātiskā atskaņošana ieslēgta",
   "disc_jockey.button.button_download_nbs": "Lejupielādēt NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponēšana iestatīta uz: %s",
   "disc_jockey.warning": "⚠ BRĪDINĀJUMS: Šis mods var tikt nepareizi atzīmēts kā krāpšana. Pirms lietošanas sazinies ar servera administratoru! (Var izslēgt iestatījumos)",
   "disc_jockey.welcome": "Disc Jockey Plus ielādēts! Spied J, lai atvērtu.",
-  "item.disc_jockey.jukebox_projector": "Disku projektors",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigurācijas versija",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Atskaņošanas sākuma aizkave (sekundes)",

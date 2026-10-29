@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Slet",
   "disc_jockey.editor.sel_all": "Vælg alt",
 
-  "creativeTab.disc_jockey": "Pladespiller-projektor",
   "disc_jockey.autoplay.off": "🔁 Automatisk afspilning deaktiveret",
   "disc_jockey.autoplay.on": "🔁 Automatisk afspilning aktiveret",
   "disc_jockey.button.button_download_nbs": "Download NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponering sat til: %s",
   "disc_jockey.warning": "⚠ ADVARSEL: Dette mod kan fejlagtigt blive markeret som snyd. Kontakt serveradministratoren før brug! (Kan deaktiveres i indstillingerne)",
   "disc_jockey.welcome": "Disc Jockey Plus indlæst! Tryk J for at åbne.",
-  "item.disc_jockey.jukebox_projector": "Pladespiller-projektor",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigurationsversion",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Forsinkelse af afspilningsstart (sekunder)",

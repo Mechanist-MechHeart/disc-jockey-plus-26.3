@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Izbriši",
   "disc_jockey.editor.sel_all": "Izberi vse",
 
-  "creativeTab.disc_jockey": "Zavihek plošč",
   "disc_jockey.autoplay.off": "🔁 Samodejno predvajanje izključeno",
   "disc_jockey.autoplay.on": "🔁 Samodejno predvajanje vključeno",
   "disc_jockey.button.button_download_nbs": "Prenesi NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponiranje nastavljeno na: %s",
   "disc_jockey.warning": "⚠ OPOZORILO: Ta modifikacija je lahko napačno zaznana kot goljufija. Pred uporabo kontaktiraj strežniškega administratorja! (Možno onemogočiti v nastavitvah)",
   "disc_jockey.welcome": "Disc Jockey Plus naložen! Pritisni J za odpiranje.",
-  "item.disc_jockey.jukebox_projector": "Projektor plošč",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Različica konfiguracije",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Zakasnitev začetka predvajanja (sekunde)",

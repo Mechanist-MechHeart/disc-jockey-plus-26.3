@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Διαγραφή",
   "disc_jockey.editor.sel_all": "Επιλογή όλων",
 
-  "creativeTab.disc_jockey": "Καρτέλα Δίσκου",
   "disc_jockey.autoplay.off": "🔁 Αυτόματη αναπαραγωγή απενεργοποιημένη",
   "disc_jockey.autoplay.on": "🔁 Αυτόματη αναπαραγωγή ενεργοποιημένη",
   "disc_jockey.button.button_download_nbs": "Λήψη NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Μεταγραφή ορίστηκε σε: %s",
   "disc_jockey.warning": "⚠ ΠΡΟΣΟΧΗ: Αυτό το mod ενδέχεται να σημανθεί εσφαλμένα ως cheat. Επικοινωνήστε με τον διαχειριστή του διακομιστή πριν τη χρήση! (Μπορεί να απενεργοποιηθεί στις ρυθμίσεις)",
   "disc_jockey.welcome": "Το Disc Jockey Plus φορτώθηκε! Πατήστε J για άνοιγμα.",
-  "item.disc_jockey.jukebox_projector": "Προβολέας δίσκου",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Έκδοση ρυθμίσεων",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Καθυστέρηση έναρξης αναπαραγωγής (δευτερόλεπτα)",

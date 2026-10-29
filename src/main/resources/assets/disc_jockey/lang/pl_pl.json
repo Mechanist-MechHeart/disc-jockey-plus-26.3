@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Usuń",
   "disc_jockey.editor.sel_all": "Zaznacz wszystko",
 
-  "creativeTab.disc_jockey": "Karta płyt",
   "disc_jockey.autoplay.off": "🔁 Autoodtwarzanie wyłączone",
   "disc_jockey.autoplay.on": "🔁 Autoodtwarzanie włączone",
   "disc_jockey.button.button_download_nbs": "Pobierz NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpozycja ustawiona na: %s",
   "disc_jockey.warning": "⚠ OSTRZEŻENIE: Ten mod może zostać błędnie oznaczony jako cheat. Skontaktuj się z administratorem serwera przed użyciem! (Można wyłączyć w ustawieniach)",
   "disc_jockey.welcome": "Disc Jockey Plus załadowany! Naciśnij J, aby otworzyć.",
-  "item.disc_jockey.jukebox_projector": "Projektor płyt",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Wersja konfiguracji",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Opóźnienie startu odtwarzania (sekundy)",

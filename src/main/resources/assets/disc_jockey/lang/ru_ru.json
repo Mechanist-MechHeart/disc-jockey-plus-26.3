@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Удалить",
   "disc_jockey.editor.sel_all": "Выделить всё",
 
-  "creativeTab.disc_jockey": "Вкладка «Пластинки»",
   "disc_jockey.autoplay.off": "🔁 Автопроигрывание отключено",
   "disc_jockey.autoplay.on": "🔁 Автопроигрывание включено",
   "disc_jockey.button.button_download_nbs": "Скачать NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Транспозиция установлена: %s",
   "disc_jockey.warning": "⚠ ПРЕДУПРЕЖДЕНИЕ: Этот мод может быть ошибочно помечен как чит. Свяжитесь с администратором сервера перед использованием! (Можно отключить в настройках)",
   "disc_jockey.welcome": "Disc Jockey Plus загружен! Нажмите J для открытия.",
-  "item.disc_jockey.jukebox_projector": "Проектор пластинок",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Версия конфигурации",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Задержка начала воспроизведения (секунды)",

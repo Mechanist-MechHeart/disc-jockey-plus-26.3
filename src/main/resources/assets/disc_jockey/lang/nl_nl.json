@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Verwijderen",
   "disc_jockey.editor.sel_all": "Alles selecteren",
 
-  "creativeTab.disc_jockey": "Platentab",
   "disc_jockey.autoplay.off": "🔁 Automatisch afspelen uitgeschakeld",
   "disc_jockey.autoplay.on": "🔁 Automatisch afspelen ingeschakeld",
   "disc_jockey.button.button_download_nbs": "NBS downloaden",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpositie ingesteld op: %s",
   "disc_jockey.warning": "⚠ WAARSCHUWING: Deze mod kan ten onrechte als cheat worden gemarkeerd. Neem contact op met de serverbeheerder voor gebruik! (Uitschakelbaar in instellingen)",
   "disc_jockey.welcome": "Disc Jockey Plus geladen! Druk op J om te openen.",
-  "item.disc_jockey.jukebox_projector": "Platenspeler-projector",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Configuratieversie",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Vertraging start afspelen (seconden)",

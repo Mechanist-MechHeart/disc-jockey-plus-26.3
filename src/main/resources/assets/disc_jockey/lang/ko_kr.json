@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "삭제",
   "disc_jockey.editor.sel_all": "전체 선택",
 
-  "creativeTab.disc_jockey": "레코드 탭",
   "disc_jockey.autoplay.off": "🔁 자동 재생을 비활성화했습니다",
   "disc_jockey.autoplay.on": "🔁 자동 재생을 활성화했습니다",
   "disc_jockey.button.button_download_nbs": "NBS 다운로드",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 전조 설정: %s",
   "disc_jockey.warning": "⚠ 경고: 이 모드는 치팅으로 오인될 수 있습니다. 사용 전 서버 관리자에게 문의하세요! (설정에서 비활성화 가능)",
   "disc_jockey.welcome": "Disc Jockey Plus가 로드되었습니다! J를 눌러 여세요.",
-  "item.disc_jockey.jukebox_projector": "레코드 프로젝터",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "설정 버전",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "재생 시작 지연 (초)",

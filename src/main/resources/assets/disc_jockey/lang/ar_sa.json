@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "حذف",
   "disc_jockey.editor.sel_all": "تحديد الكل",
 
-  "creativeTab.disc_jockey": "جهاز عرض الأسطوانات",
   "disc_jockey.autoplay.off": "🔁 تشغيل تلقائي معطّل",
   "disc_jockey.autoplay.on": "🔁 تشغيل تلقائي مُفعّل",
   "disc_jockey.button.button_download_nbs": "تحميل NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 تم ضبط النقل على: %s",
   "disc_jockey.warning": "⚠ تحذير: قد يُعتبر هذا المود غشاً بشكل خاطئ. تواصل مع مسؤول السيرفر قبل الاستخدام! (يمكن تعطيله في الإعدادات)",
   "disc_jockey.welcome": "تم تحميل Disc Jockey Plus! اضغط J للفتح.",
-  "item.disc_jockey.jukebox_projector": "جهاز عرض الأسطوانات",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "إصدار الإعدادات",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "تأخير بدء التشغيل (ثوانٍ)",

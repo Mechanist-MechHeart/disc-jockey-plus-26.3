@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "हटाएँ",
   "disc_jockey.editor.sel_all": "सब चुनें",
 
-  "creativeTab.disc_jockey": "डिस्क टैब",
   "disc_jockey.autoplay.off": "🔁 ऑटो-प्ले बंद",
   "disc_jockey.autoplay.on": "🔁 ऑटो-प्ले चालू",
   "disc_jockey.button.button_download_nbs": "NBS डाउनलोड करें",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 स्थानांतरण सेट किया गया: %s",
   "disc_jockey.warning": "⚠ चेतावनी: यह मॉड को गलत तरीके से धोखाधड़ी के रूप में चिह्नित किया जा सकता है। उपयोग से पहले सर्वर एडमिन से संपर्क करें! (कॉन्फिग में बंद किया जा सकता है)",
   "disc_jockey.welcome": "डिस्क जॉकी प्लस लोड हुआ! खोलने के लिए J दबाएं।",
-  "item.disc_jockey.jukebox_projector": "डिस्क प्रोजेक्टर",
   "key.category.disc_jockey": "डिस्क जॉकी",
   "text.autoconfig.disc_jockey.option.configVersion": "कॉन्फिग संस्करण",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "प्लेबैक प्रारंभ विलंब (सेकंड)",

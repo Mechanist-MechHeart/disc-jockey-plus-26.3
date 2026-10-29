@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Elimina",
   "disc_jockey.editor.sel_all": "Selecciona-ho tot",
 
-  "creativeTab.disc_jockey": "Projector de disc",
   "disc_jockey.autoplay.off": "🔁 Reproducció automàtica desactivada",
   "disc_jockey.autoplay.on": "🔁 Reproducció automàtica activada",
   "disc_jockey.button.button_download_nbs": "Baixa NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transposició establerta a: %s",
   "disc_jockey.warning": "⚠ AVÍS: Aquest mod pot ser detectat erròniament com a trampa. Contacta amb l'administrador del servidor abans d'usar-lo! (Es pot desactivar a la configuració)",
   "disc_jockey.welcome": "Disc Jockey Plus carregat! Prem J per obrir.",
-  "item.disc_jockey.jukebox_projector": "Projector de disc",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Versió de configuració",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Retard d'inici de reproducció (segons)",

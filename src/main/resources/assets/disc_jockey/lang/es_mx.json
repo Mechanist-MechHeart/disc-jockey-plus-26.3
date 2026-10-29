@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Eliminar",
   "disc_jockey.editor.sel_all": "Seleccionar todo",
 
-  "creativeTab.disc_jockey": "Pestaña de disco",
   "disc_jockey.autoplay.off": "🔁 Reproducción automática desactivada",
   "disc_jockey.autoplay.on": "🔁 Reproducción automática activada",
   "disc_jockey.button.button_download_nbs": "Descargar NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transposición establecida en: %s",
   "disc_jockey.warning": "⚠ ADVERTENCIA: Este mod puede ser marcado falsamente como trampa. ¡Contacta al administrador del servidor antes de usarlo! (Se puede desactivar en la configuración)",
   "disc_jockey.welcome": "Disc Jockey Plus cargado. Presiona J para abrir.",
-  "item.disc_jockey.jukebox_projector": "Proyector de disco",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Versión de Configuración",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Retraso de inicio de reproducción (segundos)",

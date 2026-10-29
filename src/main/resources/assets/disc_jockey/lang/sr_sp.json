@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Избриши",
   "disc_jockey.editor.sel_all": "Изабери све",
 
-  "creativeTab.disc_jockey": "Kartica ploča",
   "disc_jockey.autoplay.off": "🔁 Аутоматско пуштање искључено",
   "disc_jockey.autoplay.on": "🔁 Аутоматско пуштање укључено",
   "disc_jockey.button.button_download_nbs": "Preuzmi NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Транспозиција постављена на: %s",
   "disc_jockey.warning": "⚠ УПОЗОРЕЊЕ: Овај мод може бити погрешно означен као варање. Контактирај администратора сервера пре употребе! (Може се искључити у подешавањима)",
   "disc_jockey.welcome": "Disc Jockey Plus учитан! Притисни J за отварање.",
-  "item.disc_jockey.jukebox_projector": "Projektor ploča",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Верзија конфигурације",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Кашњење почетка репродукције (секунде)",

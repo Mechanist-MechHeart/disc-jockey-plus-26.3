@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Löschen",
   "disc_jockey.editor.sel_all": "Alle auswählen",
 
-  "creativeTab.disc_jockey": "Plattenspieler-Tab",
   "disc_jockey.autoplay.off": "🔁 Auto-Play deaktiviert",
   "disc_jockey.autoplay.on": "🔁 Auto-Play aktiviert",
   "disc_jockey.button.button_download_nbs": "NBS herunterladen",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponierung gesetzt auf: %s",
   "disc_jockey.warning": "⚠ WARNUNG: Dieser Mod kann fälschlicherweise als Cheat erkannt werden. Kontaktiere den Server-Admin vor der Nutzung! (Kann in den Einstellungen deaktiviert werden)",
   "disc_jockey.welcome": "Disc Jockey Plus geladen! Drücke J zum Öffnen.",
-  "item.disc_jockey.jukebox_projector": "Plattenspieler-Projektor",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigurationsversion",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Verzögerung vor Wiedergabestart (Sekunden)",

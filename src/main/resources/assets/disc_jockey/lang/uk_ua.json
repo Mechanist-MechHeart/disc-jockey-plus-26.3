@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Видалити",
   "disc_jockey.editor.sel_all": "Виділити все",
 
-  "creativeTab.disc_jockey": "Вкладка платівок",
   "disc_jockey.autoplay.off": "🔁 Автопрогравання вимкнено",
   "disc_jockey.autoplay.on": "🔁 Автопрогравання увімкнено",
   "disc_jockey.button.button_download_nbs": "Завантажити NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Транспозицію встановлено: %s",
   "disc_jockey.warning": "⚠ ПОПЕРЕДЖЕННЯ: Цей мод може бути помилково позначено як чіт. Зв'яжіться з адміністратором сервера перед використанням! (Можна вимкнути в налаштуваннях)",
   "disc_jockey.welcome": "Disc Jockey Plus завантажено! Натисніть J для відкриття.",
-  "item.disc_jockey.jukebox_projector": "Проєктор платівок",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Версія конфігурації",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Затримка початку відтворення (секунди)",

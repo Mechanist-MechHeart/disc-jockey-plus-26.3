@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "מחק",
   "disc_jockey.editor.sel_all": "בחר הכל",
 
-  "creativeTab.disc_jockey": "כרטיסיית תקליטים",
   "disc_jockey.autoplay.off": "🔁 ניגון אוטומטי מבוטל",
   "disc_jockey.autoplay.on": "🔁 ניגון אוטומטי מופעל",
   "disc_jockey.button.button_download_nbs": "הורד NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 טרנספוזיציה הוגדרה ל: %s",
   "disc_jockey.warning": "⚠ אזהרה: מוד זה עלול להיחשב בטעות כרמאות. צור קשר עם מנהל השרת לפני השימוש! (ניתן לביטול בהגדרות)",
   "disc_jockey.welcome": "Disc Jockey Plus נטען! לחץ J לפתיחה.",
-  "item.disc_jockey.jukebox_projector": "מקרן תקליטים",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "גרסת הגדרות",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "עיכוב התחלת ניגון (שניות)",

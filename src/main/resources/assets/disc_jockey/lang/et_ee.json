@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Kustuta",
   "disc_jockey.editor.sel_all": "Vali kõik",
 
-  "creativeTab.disc_jockey": "Plaadikaart",
   "disc_jockey.autoplay.off": "🔁 Automaatne taasesitus väljas",
   "disc_jockey.autoplay.on": "🔁 Automaatne taasesitus sees",
   "disc_jockey.button.button_download_nbs": "Laadi NBS alla",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponeerimine seatud: %s",
   "disc_jockey.warning": "⚠ HOIATUS: See mod võib ekslikult tõlgendada pettusena. Võta enne kasutamist ühendust serveri administraatoriga! (Saab seadetes välja lülitada)",
   "disc_jockey.welcome": "Disc Jockey Plus laaditud! Vajuta J avamiseks.",
-  "item.disc_jockey.jukebox_projector": "Plaadiprojektor",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Seadete versioon",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Esituse alustamise viivitus (sekundid)",

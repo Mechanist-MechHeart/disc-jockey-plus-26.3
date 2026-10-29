@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "削除",
   "disc_jockey.editor.sel_all": "全選択",
 
-  "creativeTab.disc_jockey": "レコードタブ",
   "disc_jockey.autoplay.off": "🔁 自動再生を無効にしました",
   "disc_jockey.autoplay.on": "🔁 自動再生を有効にしました",
   "disc_jockey.button.button_download_nbs": "NBS をダウンロード",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 移調を設定: %s",
   "disc_jockey.warning": "⚠ 警告: このMODはチートと誤検知される可能性があります。使用前にサーバー管理者に連絡してください！（設定で非表示可）",
   "disc_jockey.welcome": "Disc Jockey Plus が読み込まれました！J キーで開きます。",
-  "item.disc_jockey.jukebox_projector": "レコードプロジェクタ",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "設定バージョン",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "再生開始遅延（秒）",

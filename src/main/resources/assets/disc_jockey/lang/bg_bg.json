@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Изтрий",
   "disc_jockey.editor.sel_all": "Избери всичко",
 
-  "creativeTab.disc_jockey": "Проектор за плочи",
   "disc_jockey.autoplay.off": "🔁 Автоматично възпроизвеждане изключено",
   "disc_jockey.autoplay.on": "🔁 Автоматично възпроизвеждане включено",
   "disc_jockey.button.button_download_nbs": "Изтегли NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Транспониране зададено на: %s",
   "disc_jockey.warning": "⚠ ПРЕДУПРЕЖДЕНИЕ: Този мод може да бъде погрешно отбелязан като чийт. Свържи се с администратора на сървъра преди употреба! (Може да се деактивира в настройките)",
   "disc_jockey.welcome": "Disc Jockey Plus е зареден! Натисни J за отваряне.",
-  "item.disc_jockey.jukebox_projector": "Проектор за плочи",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Версия на конфигурацията",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Закъснение на старта на възпроизвеждане (секунди)",

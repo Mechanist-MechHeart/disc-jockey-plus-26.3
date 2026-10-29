@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Șterge",
   "disc_jockey.editor.sel_all": "Selectează tot",
 
-  "creativeTab.disc_jockey": "Filă Disc",
   "disc_jockey.autoplay.off": "🔁 Redare automată dezactivată",
   "disc_jockey.autoplay.on": "🔁 Redare automată activată",
   "disc_jockey.button.button_download_nbs": "Descarcă NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpunere setată la: %s",
   "disc_jockey.warning": "⚠ AVERTISMENT: Acest mod poate fi marcat greșit ca și cheat. Contactează administratorul serverului înainte de utilizare! (Poate fi dezactivat din setări)",
   "disc_jockey.welcome": "Disc Jockey Plus încărcat! Apasă J pentru a deschide.",
-  "item.disc_jockey.jukebox_projector": "Proiector de disc",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Versiune configurare",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Întârziere pornire redare (secunde)",

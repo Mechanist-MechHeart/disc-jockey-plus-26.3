@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Smazat",
   "disc_jockey.editor.sel_all": "Vybrat vše",
 
-  "creativeTab.disc_jockey": "Projektor desek",
   "disc_jockey.autoplay.off": "🔁 Automatické přehrávání vypnuto",
   "disc_jockey.autoplay.on": "🔁 Automatické přehrávání zapnuto",
   "disc_jockey.button.button_download_nbs": "Stáhnout NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpozice nastavena na: %s",
   "disc_jockey.warning": "⚠ VAROVÁNÍ: Tento mod může být mylně označen jako cheat. Před použitím kontaktujte správce serveru! (Lze vypnout v nastavení)",
   "disc_jockey.welcome": "Disc Jockey Plus načten! Stiskněte J pro otevření.",
-  "item.disc_jockey.jukebox_projector": "Projektor desek",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Verze konfigurace",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Zpoždění začátku přehrávání (sekundy)",

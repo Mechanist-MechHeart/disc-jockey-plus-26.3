@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "删除",
   "disc_jockey.editor.sel_all": "全选",
 
-  "creativeTab.disc_jockey": "唱片机投影仪",
   "disc_jockey.autoplay.off": "🔁 自动切歌 已关闭",
   "disc_jockey.autoplay.on": "🔁 自动切歌 已开启",
   "disc_jockey.button.download_nbs": "下载 NBS",
@@ -145,7 +144,6 @@
   "disc_jockey.transpose.set": "🎼 音高已设置为：%s",
   "disc_jockey.warning": "⚠ 警告：该模组极易被反作弊误判为作弊，使用前请联系服务器管理员！（可在设置中关闭此提示）",
   "disc_jockey.welcome": "Disc Jockey Plus 已加载！按 J 打开。",
-  "item.disc_jockey.jukebox_projector": "唱片机投影仪",
   "key.category.disc_jockey": "🎶点歌台",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "播放开始延迟（秒）",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs.@Tooltip[0]": "调音后延迟多少秒开始播放（如 0.5 表示半秒）。",

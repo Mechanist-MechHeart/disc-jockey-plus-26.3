@@ -27,11 +27,12 @@
 
 | 版本 | 状态 | 说明 |
 |---|---|---|
-| **2.9.3** | ✅ **推荐使用** | 投影改为**平面舞台**布局，音符盒全在脚下一层、都够得到 |
+| **2.9.4** | ✅ **推荐使用** | 平面舞台投影 + **移除了非原版物品**（纯净原版体验） |
+| 2.9.3 | ⚠️ 旧版 | 平面舞台投影（但含非原版的「唱片机投影器」物品） |
 | 2.9.2 | ❌ **已废弃**（Release 已删除） | 3D 球壳投影布局有问题，很多音符盒被挡住/够不到，请勿使用 |
 | 2.9.1 | ⚠️ 旧版 | 只有构建修复 + 界面重排，没有投影功能 |
 
-> 2.9.2 的 Release 和 tag 已从仓库删除；如果需要旧版行为，请直接使用 **2.9.3**（投影布局已修正）。
+> 2.9.2 的 Release 和 tag 已从仓库删除；**2.9.4** 起已移除模组自带的非原版物品，推荐使用最新版。
 
 ---
 
@@ -126,7 +127,7 @@
 
 1. 安装 **Fabric Loader**（≥ 0.19.5）与 **Fabric API**
 2. 安装 **Cloth Config**（必需），可选装 **ModMenu**（配置入口）、**PianoLib**（钢琴采样）
-3. 把 `disc_jockey_plus-2.9.3.jar` 丢进 `mods/`
+3. 把 `disc_jockey_plus-2.9.4.jar` 丢进 `mods/`
 4. 进游戏按 `J` 打开界面，选歌 → 播放
 5. 首次启动会生成 `config/disc_jockey/`，把 `.nbs` 歌曲放进去（或用界面里的「下载 NBS」）
 
@@ -144,7 +145,7 @@
 
 ```bash
 ./gradlew build
-# 产物：build/libs/disc_jockey_plus-2.9.1.jar
+# 产物：build/libs/disc_jockey_plus-2.9.4.jar
 ```
 
 > ⚠️ `gradle.properties` 里的 `org.gradle.java.home` 指向 JDK 25 的安装路径，**请按你自己机器修改**（或删掉该行、用 `JAVA_HOME`）。
@@ -173,7 +174,11 @@
 
 ![新布局示意](assets/layout-v2-preview.png)
 
-### 3. 新增「生成投影」（`SchematicExporter`，v2.9.3）
+### 4. 移除非原版物品（v2.9.4）
+- 删除上游自带的 **「唱片机投影器」（`jukebox_projector`）** 物品：`JukeboxProjectorItem` 类、物品注册、创造页标签 `DiscJockeyCreativeTab`、配方、模型/贴图，以及 40 个语言文件里的对应词条
+- 现在模组**不新增任何物品**，只使用原版音符盒/方块，纯净原版体验
+
+### 3. 新增「生成投影」（`SchematicExporter`，v2.9.3+）
 - 新增 `SchematicExporter`：解析当前歌曲的 (音色, 音高) 组合，**铺成一层平面舞台**
   （音符盒全部在同一层、正下方放对应音色方块，玩家站在中间；手长 4.5 格内、全部可见可点），
   导出 Litematica `.litematic`

@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Ta bort",
   "disc_jockey.editor.sel_all": "Markera allt",
 
-  "creativeTab.disc_jockey": "Skivflik",
   "disc_jockey.autoplay.off": "🔁 Automatisk uppspelning inaktiverad",
   "disc_jockey.autoplay.on": "🔁 Automatisk uppspelning aktiverad",
   "disc_jockey.button.button_download_nbs": "Ladda ner NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponering satt till: %s",
   "disc_jockey.warning": "⚠ VARNING: Denna mod kan felaktigt flaggas som fusk. Kontakta serveradministratören innan användning! (Kan inaktiveras i inställningar)",
   "disc_jockey.welcome": "Disc Jockey Plus laddad! Tryck J för att öppna.",
-  "item.disc_jockey.jukebox_projector": "Skivspelarprojektor",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigurationsversion",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Fördröjning start uppspelning (sekunder)",

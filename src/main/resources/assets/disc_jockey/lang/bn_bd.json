@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "মুছুন",
   "disc_jockey.editor.sel_all": "সব নির্বাচন",
 
-  "creativeTab.disc_jockey": "ডিস্ক প্রজেক্টর",
   "disc_jockey.autoplay.off": "🔁 স্বয়ংক্রিয় প্লে-ব্যাক বন্ধ",
   "disc_jockey.autoplay.on": "🔁 স্বয়ংক্রিয় প্লে-ব্যাক চালু",
   "disc_jockey.button.button_download_nbs": "NBS ডাউনলোড",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 ট্রান্সপোজ সেট করা হয়েছে: %s",
   "disc_jockey.warning": "⚠ সতর্কতা: এই মডটি ভুলবশত চিট হিসেবে চিহ্নিত হতে পারে। ব্যবহারের আগে সার্ভার অ্যাডমিনের সাথে যোগাযোগ করুন! (সেটিংসে নিষ্ক্রিয় করা যাবে)",
   "disc_jockey.welcome": "Disc Jockey Plus লোড হয়েছে! খুলতে J চাপুন।",
-  "item.disc_jockey.jukebox_projector": "ডিস্ক প্রজেক্টর",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "কনফিগারেশন সংস্করণ",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "প্লে-ব্যাক শুরুর বিলম্ব (সেকেন্ড)",

@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Supprimer",
   "disc_jockey.editor.sel_all": "Tout sélectionner",
 
-  "creativeTab.disc_jockey": "Onglet Disque",
   "disc_jockey.autoplay.off": "🔁 Lecture automatique désactivée",
   "disc_jockey.autoplay.on": "🔁 Lecture automatique activée",
   "disc_jockey.button.button_download_nbs": "Télécharger NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transposition réglée sur : %s",
   "disc_jockey.warning": "⚠ AVERTISSEMENT : Ce mod peut être détecté à tort comme une triche. Contactez votre administrateur serveur avant utilisation ! (Peut être désactivé dans les paramètres)",
   "disc_jockey.welcome": "Disc Jockey Plus chargé ! Appuyez sur J pour ouvrir.",
-  "item.disc_jockey.jukebox_projector": "Projecteur de disque",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Version de la configuration",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Délai de début de lecture (secondes)",

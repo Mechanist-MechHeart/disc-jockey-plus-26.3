@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Xóa",
   "disc_jockey.editor.sel_all": "Chọn tất cả",
 
-  "creativeTab.disc_jockey": "Thẻ đĩa",
   "disc_jockey.autoplay.off": "🔁 Tự động phát tắt",
   "disc_jockey.autoplay.on": "🔁 Tự động phát bật",
   "disc_jockey.button.button_download_nbs": "Tải NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Chuyển tông đặt thành: %s",
   "disc_jockey.warning": "⚠ CẢNH BÁO: Mod này có thể bị nhận nhầm là gian lận. Hãy liên hệ quản trị viên máy chủ trước khi dùng! (Có thể tắt trong cài đặt)",
   "disc_jockey.welcome": "Disc Jockey Plus đã tải! Nhấn J để mở.",
-  "item.disc_jockey.jukebox_projector": "Máy chiếu đĩa",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Phiên bản cấu hình",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Trì hoãn bắt đầu phát (giây)",

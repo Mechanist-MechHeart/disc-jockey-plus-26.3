@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Ištrinti",
   "disc_jockey.editor.sel_all": "Pasirinkti viską",
 
-  "creativeTab.disc_jockey": "Disko kortelė",
   "disc_jockey.autoplay.off": "🔁 Automatinis grojimas išjungtas",
   "disc_jockey.autoplay.on": "🔁 Automatinis grojimas įjungtas",
   "disc_jockey.button.button_download_nbs": "Atsisiųsti NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponavimas nustatytas: %s",
   "disc_jockey.warning": "⚠ ĮSPĖJIMAS: Šis modas gali būti klaidingai pažymėtas kaip sukčiavimas. Prieš naudojimą susisiekite su serverio administratoriumi! (Galima išjungti nustatymuose)",
   "disc_jockey.welcome": "Disc Jockey Plus įkeltas! Paspauskite J, kad atidarytumėte.",
-  "item.disc_jockey.jukebox_projector": "Diskų grotuvo projektorius",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigūracijos versija",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Grojimo pradžios vėlavimas (sekundėmis)",

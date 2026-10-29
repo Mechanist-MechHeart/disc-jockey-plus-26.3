@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "刪除",
   "disc_jockey.editor.sel_all": "全選",
 
-  "creativeTab.disc_jockey": "唱片機投影儀",
   "disc_jockey.autoplay.off": "🔁 自動切歌 已關閉",
   "disc_jockey.autoplay.on": "🔁 自動切歌 已開啟",
   "disc_jockey.button.button_download_nbs": "下載 NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 音高已設定為：%s",
   "disc_jockey.warning": "⚠ 警告：此模組極易被反作弊誤判為作弊，使用前請聯繫伺服器管理員！（可在設定中關閉此提示）",
   "disc_jockey.welcome": "Disc Jockey Plus 已載入！按 J 開啟。",
-  "item.disc_jockey.jukebox_projector": "唱片機投影儀",
   "key.category.disc_jockey": "點歌台",
   "text.autoconfig.disc_jockey.option.configVersion": "設定版本",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "播放延遲（秒）",

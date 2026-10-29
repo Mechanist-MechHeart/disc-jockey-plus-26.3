@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Slett",
   "disc_jockey.editor.sel_all": "Velg alt",
 
-  "creativeTab.disc_jockey": "Platefane",
   "disc_jockey.autoplay.off": "🔁 Automatisk avspilling deaktivert",
   "disc_jockey.autoplay.on": "🔁 Automatisk avspilling aktivert",
   "disc_jockey.button.button_download_nbs": "Last ned NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transponering satt til: %s",
   "disc_jockey.warning": "⚠ ADVARSEL: Dette moddet kan feilaktig bli merket som juks. Kontakt serveradministrator før bruk! (Kan deaktiveres i innstillingene)",
   "disc_jockey.welcome": "Disc Jockey Plus lastet! Trykk J for å åpne.",
-  "item.disc_jockey.jukebox_projector": "Plateprojektor",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfigurasjonsversjon",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Forsinkelse av avspillingsstart (sekunder)",

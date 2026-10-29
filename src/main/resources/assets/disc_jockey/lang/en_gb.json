@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Delete",
   "disc_jockey.editor.sel_all": "Select All",
 
-  "creativeTab.disc_jockey": "Disc Jockey Tab",
   "disc_jockey.autoplay.off": "🔁 Auto-play disabled",
   "disc_jockey.autoplay.on": "🔁 Auto-play enabled",
   "disc_jockey.button.button_download_nbs": "Download NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpose set to: %s",
   "disc_jockey.warning": "⚠ WARNING: This mod may be falsely flagged as cheating. Contact your server admin before use! (Can be disabled in config)",
   "disc_jockey.welcome": "Disc Jockey Plus loaded! Press J to open.",
-  "item.disc_jockey.jukebox_projector": "Disc Jockey Projector",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Config Version",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Playback Start Delay (Seconds)",

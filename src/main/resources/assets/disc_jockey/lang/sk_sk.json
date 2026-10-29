@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Odstrániť",
   "disc_jockey.editor.sel_all": "Vybrať všetko",
 
-  "creativeTab.disc_jockey": "Karta platní",
   "disc_jockey.autoplay.off": "🔁 Automatické prehrávanie vypnuté",
   "disc_jockey.autoplay.on": "🔁 Automatické prehrávanie zapnuté",
   "disc_jockey.button.button_download_nbs": "Stiahnuť NBS",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transpozícia nastavená na: %s",
   "disc_jockey.warning": "⚠ UPOZORNENIE: Tento mód môže byť nesprávne označený ako podvod. Pred použitím kontaktuj administrátora servera! (Dá sa vypnúť v nastaveniach)",
   "disc_jockey.welcome": "Disc Jockey Plus načítaný! Stlač J pre otvorenie.",
-  "item.disc_jockey.jukebox_projector": "Projektor platní",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Verzia konfigurácie",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Oneskorenie štartu prehrávania (sekundy)",

@@ -14,7 +14,6 @@
   "disc_jockey.editor.del": "Törlés",
   "disc_jockey.editor.sel_all": "Mindent kijelöl",
 
-  "creativeTab.disc_jockey": "Lemez fül",
   "disc_jockey.autoplay.off": "🔁 Automatikus lejátszás kikapcsolva",
   "disc_jockey.autoplay.on": "🔁 Automatikus lejátszás bekapcsolva",
   "disc_jockey.button.button_download_nbs": "NBS letöltése",
@@ -149,7 +148,6 @@
   "disc_jockey.transpose.set": "🎼 Transzponálás beállítva: %s",
   "disc_jockey.warning": "⚠ FIGYELMEZTETÉS: Ez a mod tévesen csalásnak jelölhető. Használat előtt vedd fel a kapcsolatot a szerver adminisztrátorával! (Letiltható a beállításokban)",
   "disc_jockey.welcome": "Disc Jockey Plus betöltve! Nyomj J-t a megnyitáshoz.",
-  "item.disc_jockey.jukebox_projector": "Lemezlejátszó-vetítő",
   "key.category.disc_jockey": "Disc Jockey",
   "text.autoconfig.disc_jockey.option.configVersion": "Konfiguráció verziója",
   "text.autoconfig.disc_jockey.option.delayPlaybackStartBySecs": "Lejátszás indításának késleltetése (másodperc)",
